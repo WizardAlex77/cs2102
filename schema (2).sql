@@ -21,6 +21,9 @@ CREATE TABLE Departments (
     dname VARCHAR(255) NOT NULL
 )
 
+CREATE TABLE test (
+)
+
 /*---------------------------------------------------------*/
 
 CREATE TABLE HealthDeclarations (
