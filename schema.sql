@@ -1,3 +1,8 @@
+DROP TABLE IF EXISTS Departments, HealthDeclarations, MeetingRooms,
+Sessions, Joins, Updates cascade;
+
+/* ====================================== CREATE TABLES ====================================== */
+
 CREATE TABLE Departments (
     did INTEGER PRIMARY KEY,
     dname VARCHAR(255) NOT NULL
@@ -76,7 +81,7 @@ CREATE TABLE Joins (
     sroom INTEGER NOT NULL,
     sfloor INTEGER NOT NULL,
     PRIMARY KEY (eid, sdate, stime),
-    CONSTRAINT session_constraint FOREIGN KEY (sdate, stime, sroom, sfloor) REFERENCES Sessions (sdate, stime, sroom, sfloor),
+    CONSTRAINT session_constraint FOREIGN KEY (sdate, stime, sroom, sfloor) REFERENCES Sessions (sdate, stime, sroom, sfloor) ON DELETE CASCADE,
     CONSTRAINT eid_constraint FOREIGN KEY (eid) REFERENCES Employees (eid)
 );
 
