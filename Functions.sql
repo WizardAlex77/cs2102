@@ -35,9 +35,10 @@ BEGIN
 	END IF;
 
 	IF (NOT EXISTS(select 1 from Departments where Departments.did = new_department_id)) THEN
-	RAISE EXCEPTION 'Employees cannot be transferred to non-existent department!';
+		RAISE EXCEPTION 'Employees cannot be transferred to non-existent department!';
 	END IF;
 
+	-- loop through employees in old department
 	OPEN curs;
 	LOOP
 		FETCH curs INTO r1; 
@@ -46,6 +47,37 @@ BEGIN
 	END LOOP;
 	RAISE NOTICE 'Department deleted successfully!';
 END;
+$$ LANGUAGE plpgsql;
+
+/*---------------------------------------------------------*/
+
+--add_room
+
+CREATE OR REPLACE PROCEDURE add_room(floor_number INTEGER, room_number INTEGER, room_name VARCHAR(255), room_capacity INTEGER, department_id INTEGER)
+AS $$
+BEGIN
+	IF (NOT EXISTS(select 1 from MeetingRooms where room = room_number AND floor = floor_number)) THEN
+		insert into MeetingRooms values (room_number, floor_number, room_name, room_capacity, department_id);
+		RAISE NOTICE 'Meeting room added successfully!';
+	ELSE
+		RAISE EXCEPTION 'Meeting room #%-% already exists!', floor_number, room_number; 
+	END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+/*---------------------------------------------------------*/
+
+--change_capacity (HAVE NOT FACTORED IN DATE)
+CREATE OR REPLACE PROCEDURE change_capacity(floor_number INTEGER, room_number INTEGER, new_capacity INTEGER, date_changed DATE)
+AS $$
+BEGIN
+	IF (NOT EXISTS(select 1 from MeetingRooms where room = room_number AND floor = floor_number)) THEN
+		RAISE EXCEPTION 'Meeting room does not exist!';
+	ELSE
+		update MeetingRooms set rcapacity = new_capacity where floor = floor_number and room = room_number;
+		RAISE NOTICE 'Meeting room capacity for #%-% has been changed!', floor_number, room_number; 
+	END IF;
+END
 $$ LANGUAGE plpgsql;
 
 /*---------------------------------------------------------*/

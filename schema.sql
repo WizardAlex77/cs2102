@@ -11,7 +11,7 @@ CREATE TABLE Departments (
 /*---------------------------------------------------------*/
 
 CREATE TABLE Employees (
-    eid INTEGER PRIMARY KEY,
+    eid INTEGER SERIAL PRIMARY KEY,
     ename VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     etype VARCHAR(10) NOT NULL,
@@ -43,9 +43,10 @@ CREATE TABLE HealthDeclarations (
 /*---------------------------------------------------------*/
 
 CREATE TABLE MeetingRooms (
-    room INTEGER NOT NULL,
     floor INTEGER NOT NULL,
+    room INTEGER NOT NULL,
     rname VARCHAR(255) NOT NULL,
+    rcapacity INTEGER,
     did INTEGER NOT NULL,
     PRIMARY KEY (room, floor),
     CONSTRAINT did_constraint FOREIGN KEY (did) REFERENCES Departments (did)
