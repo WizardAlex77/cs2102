@@ -1,4 +1,61 @@
 /*---------------------------------------------------------*/
+/* BASIC FUNCTIONALITIES */
+/*---------------------------------------------------------*/
+
+--add_department
+
+CREATE OR REPLACE PROCEDURE add_department(department_id INTEGER, department_name VARCHAR(255))
+AS $$
+BEGIN
+	IF (NOT EXISTS(select 1 from Departments where Departments.did = department_id)) THEN
+		IF (NOT EXISTS(select 1 from Departments where Departments.dname = department_name)) THEN
+			insert into Departments values (department_id, department_name);
+			RAISE NOTICE 'Department added successfully!';
+		ELSE
+			RAISE EXCEPTION '% department already exists!', department_name;
+		END IF;
+	ELSE
+		RAISE EXCEPTION 'Department ID already exists!';
+	END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+/*---------------------------------------------------------*/
+
+--remove_department
+
+CREATE OR REPLACE PROCEDURE remove_department(department_id_to_remove INTEGER, new_department_id INTEGER)
+AS $$
+DECLARE
+	curs CURSOR FOR (select e.eid, e.did from Employees e where e.did = department_id_to_remove);
+	r1 RECORD;
+BEGIN
+	IF (NOT EXISTS(select 1 from Departments where Departments.did = department_id_to_remove)) THEN
+		RAISE EXCEPTION 'Department to be removed does not exist!';
+	END IF;
+
+	IF (NOT EXISTS(select 1 from Departments where Departments.did = new_department_id)) THEN
+	RAISE EXCEPTION 'Employees cannot be transferred to non-existent department!';
+	END IF;
+
+	OPEN curs;
+	LOOP
+		FETCH curs INTO r1; 
+		EXIT WHEN NOT FOUND;
+		update Employees set did = new_department_id where eid = r1.eid;
+	END LOOP;
+	RAISE NOTICE 'Department deleted successfully!';
+END;
+$$ LANGUAGE plpgsql;
+
+/*---------------------------------------------------------*/
+
+--add_employee
+
+CREATE OR REPLACE PROCEDURE add_employee(ename VARCHAR(255), email VARCHAR(255), etype VARCHAR(10), did INTEGER,
+    mp_num INTEGER, op_num INTEGER, hp_num INTEGER, department ?????)
+
+/*---------------------------------------------------------*/
 
 --declare_health
 
