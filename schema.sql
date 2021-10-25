@@ -97,8 +97,8 @@ CREATE TABLE Joins (
 
 CREATE TABLE Updates (
     udate DATE NOT NULL,
-    room INTEGER NOT NULL,
     floor INTEGER NOT NULL,
+    room INTEGER NOT NULL,
     capacity INTEGER NOT NULL,
     PRIMARY KEY (udate, room, floor),
     CONSTRAINT meetingroom_constraint FOREIGN KEY (room, floor) REFERENCES MeetingRooms (room, floor)
