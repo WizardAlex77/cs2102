@@ -84,8 +84,8 @@ $$ LANGUAGE plpgsql;
 
 --add_employee
 
-CREATE OR REPLACE PROCEDURE add_employee(ename VARCHAR(255), email VARCHAR(255), etype VARCHAR(10), did INTEGER,
-    mp_num INTEGER, op_num INTEGER, hp_num INTEGER, department ?????)
+--CREATE OR REPLACE PROCEDURE add_employee(ename VARCHAR(255), email VARCHAR(255), etype VARCHAR(10), did INTEGER,
+    --mp_num INTEGER, op_num INTEGER, hp_num INTEGER, department ?????)
 
 /*---------------------------------------------------------*/
 
@@ -109,7 +109,7 @@ BEGIN
         IF ((SELECT s.participants FROM Sessions s WHERE sdate = mdate AND stime = mshour AND sroom = mroom AND sfloor = mfloor) < cap) THEN
             WHILE temp < mehour LOOP
                 INSERT INTO Joins
-                VALUES (emp, mdate, temp, mroom, mfloor);
+                VALUES (emp, mdate, temp, mfloor, mroom);
                 
                 UPDATE Sessions 
                 SET participants = participants + 1 
