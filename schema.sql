@@ -62,8 +62,9 @@ CREATE TABLE Sessions (
     stime TIME NOT NULL,
     sroom INTEGER NOT NULL,
     sfloor INTEGER NOT NULL,
-    bookerid INTEGER NOT NULL, 
-    approval_status VARCHAR(10),
+    bookerid INTEGER NOT NULL,
+    participants INTEGER NOT NULL,
+    approval_status VARCHAR(10) CHECK (approval_status IN ('approved', 'rejected')),
     PRIMARY KEY (sdate, stime, sroom, sfloor),
     CONSTRAINT meetingroom_constraint FOREIGN KEY (sroom, sfloor) REFERENCES MeetingRooms (room, floor),
     CONSTRAINT booker_constraint FOREIGN KEY (bookerid) REFERENCES Employees (eid)
