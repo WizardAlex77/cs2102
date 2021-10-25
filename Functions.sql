@@ -89,6 +89,147 @@ CREATE OR REPLACE PROCEDURE add_employee(ename VARCHAR(255), email VARCHAR(255),
 
 /*---------------------------------------------------------*/
 
+/*---------------------------------------------------------*/
+/* CORE */
+/*---------------------------------------------------------*/
+
+-- join_meeting
+
+CREATE OR REPLACE PROCEDURE join_meeting
+(mfloor INTEGER, mroom INTEGER, mdate DATE, mshour TIME, mehour TIME, emp INTEGER)
+AS $$
+DECLARE 
+    temp TIME := mshour;
+    cap INTEGER;
+BEGIN
+    
+    IF (EXISTS(SELECT 1 FROM Sessions WHERE sdate = mdate AND stime = mshour AND sroom = mroom AND sfloor = mfloor AND approval_status IS NULL)) THEN
+        --SELECT u.capacity INTO cap FROM Updates u WHERE room = mroom AND floor = mfloor ORDER BY udate DESC LIMIT 1;
+        SELECT rcapacity INTO cap FROM MeetingRooms WHERE room = mroom AND floor = mfloor;
+        IF ((SELECT s.participants FROM Sessions s WHERE sdate = mdate AND stime = mshour AND sroom = mroom AND sfloor = mfloor) < cap) THEN
+            WHILE temp < mehour LOOP
+                INSERT INTO Joins
+                VALUES (emp, mdate, temp, mroom, mfloor);
+                
+                UPDATE Sessions 
+                SET participants = participants + 1 
+                WHERE sdate = mdate 
+                AND stime = temp 
+                AND sroom = mroom 
+                AND sfloor = mfloor;
+                
+                temp := temp + interval '1 hour';
+            END LOOP;
+        ELSE
+            RAISE NOTICE 'room capacity reached';
+        END IF;
+    ELSE 
+        RAISE NOTICE 'session does not exist or has already been finalized';
+
+    END IF;
+
+END;
+$$ LANGUAGE plpgsql;
+
+-- book_room needs to call join meeting as well
+-- function assumes that if the meeting exists, that the end hour is correct.
+/*---------------------------------------------------------*/
+
+-- leave_meeting
+
+CREATE OR REPLACE PROCEDURE leave_meeting
+(mfloor INTEGER, mroom INTEGER, mdate DATE, mshour TIME, mehour TIME, emp INTEGER)
+AS $$
+DECLARE
+    temp TIME := mshour;
+BEGIN
+
+    IF (EXISTS(SELECT 1 FROM Sessions WHERE sdate = mdate AND stime = mshour AND sroom = mroom AND sfloor = mfloor AND approval_status IS NULL)) THEN
+
+        WHILE temp < mehour LOOP
+            DELETE FROM Joins 
+            WHERE eid = emp
+            AND sdate = mdate
+            AND stime = temp
+            AND sfloor = mfloor
+            AND sroom  = mroom;
+           
+
+            UPDATE Sessions
+            SET participants = participants - 1
+            WHERE sdate = mdate
+            AND stime = temp
+            AND sroom = mroom
+            AND sfloor = mfloor;
+
+            temp := temp + interval '1 hour';
+        END LOOP;
+
+    ELSE 
+        RAISE NOTICE 'session does not exist or has already been finalized';
+
+    END IF;
+
+END;
+$$ LANGUAGE plpgsql;
+
+/*---------------------------------------------------------*/
+
+-- approve_meeting
+
+CREATE OR REPLACE PROCEDURE approve_meeting
+(mfloor INTEGER, mroom INTEGER, mdate DATE, mshour TIME, mehour TIME, emp INTEGER, decision VARCHAR(10))
+AS $$
+DECLARE
+    temp TIME := mshour;
+BEGIN
+
+    IF (EXISTS(SELECT 1 FROM Sessions WHERE sdate = mdate AND stime = mshour AND sroom = mroom AND sfloor = mfloor AND approval_status IS NULL)) THEN
+        IF (((SELECT etype FROM Employees WHERE eid = emp) = 'Manager')
+        AND ((SELECT did FROM Employees WHERE eid = emp) = (SELECT did FROM MeetingRooms WHERE floor = mfloor AND room = mroom))) THEN
+            WHILE temp < mehour LOOP
+                UPDATE Sessions
+                SET approval_status = decision
+                WHERE sdate = mdate
+                AND stime = mshour
+                AND sroom = mroom
+                AND sfloor = mfloor;
+                temp := temp + interval '1 hour';
+            END LOOP;
+        
+        ELSE 
+            RAISE NOTICE 'approver does not have approval rights for this room';
+
+        END IF;
+
+    ELSE
+        RAISE NOTICE 'session does not exist or has already been approved';
+
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER reject_meeting
+AFTER INSERT OR UPDATE ON Sessions
+FOR EACH ROW WHEN (NEW.approval_status = 'rejected')
+EXECUTE FUNCTION delete_meeting();
+
+CREATE OR REPLACE FUNCTION delete_meeting() 
+RETURNS TRIGGER AS $$
+BEGIN
+    DELETE FROM Sessions
+    WHERE approval_status = 'rejected'
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+-- employee must be a manager from the same department 
+/*---------------------------------------------------------*/
+
+
+/*---------------------------------------------------------*/
+/* HEALTH */
+/*---------------------------------------------------------*/
 --declare_health
 
 CREATE OR REPLACE PROCEDURE DeclareHealth
