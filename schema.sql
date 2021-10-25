@@ -60,8 +60,8 @@ CREATE TABLE MeetingRooms (
 CREATE TABLE Sessions (
     sdate DATE NOT NULL,
     stime TIME NOT NULL,
-    sroom INTEGER NOT NULL,
     sfloor INTEGER NOT NULL,
+    sroom INTEGER NOT NULL,
     bookerid INTEGER NOT NULL,
     participants INTEGER NOT NULL,
     approval_status VARCHAR(10) CHECK (approval_status IN ('approved', 'rejected')),
@@ -80,8 +80,8 @@ CREATE TABLE Joins (
     eid INTEGER NOT NULL,
     sdate DATE NOT NULL,
     stime TIME NOT NULL,
-    sroom INTEGER NOT NULL,
     sfloor INTEGER NOT NULL,
+    sroom INTEGER NOT NULL,
     PRIMARY KEY (eid, sdate, stime),
     CONSTRAINT session_constraint FOREIGN KEY (sdate, stime, sroom, sfloor) REFERENCES Sessions (sdate, stime, sroom, sfloor) ON DELETE CASCADE,
     CONSTRAINT eid_constraint FOREIGN KEY (eid) REFERENCES Employees (eid)
