@@ -14,6 +14,7 @@ insert into MeetingRooms values (2, 13, 'Auditorium', 100, 1);
 
 -- HUMAN RESOURCES MEETING ROOMS
 insert into MeetingRooms values (2, 22, 'HR Conferencing Room', 20, 2);
+insert into MeetingRooms values (2, 23, 'HR private room', 2, 2); -- room with small capacity for testing purposes
 insert into MeetingRooms values (2, 25, 'Videoconferencing Room', 30, 2);
 insert into MeetingRooms values (3, 11, 'Specialists Meeting Room', 15, 2);
 insert into MeetingRooms values (3, 14, 'Reception Room', 10, 2);
@@ -26,3 +27,11 @@ insert into MeetingRooms values (3, 32, 'Hollow Square Room', 9, 3);
 insert into MeetingRooms values (4, 11, 'Database Meeting Room', 40, 4);
 insert into MeetingRooms values (4, 17, 'Database Meeting Room', 30, 4);
 insert into MeetingRooms values (4, 34, 'Videoconferencing Room', 32, 4);
+
+INSERT INTO Sessions VALUES ('2022-04-18', '08:00:00' , 2 , 22 , 2, 1, NULL); -- HR conferencing room
+INSERT INTO Sessions VALUES ('2022-04-10', '09:00:00' , 2 , 23 , 3, 1, NULL); -- HR private room
+INSERT INTO Sessions VALUES ('2022-05-10', '09:00:00' , 2 , 25 , 3, 1, 'approved'); -- Videoconferencing Room
+
+INSERT INTO Joins VALUES(2,'2022-04-18', '08:00:00', 2, 22); -- to simulate initial booking of HR conferencing room
+INSERT INTO Joins VALUES(3,'2022-04-10', '09:00:00', 2, 23); -- to simulate initial booking of HR private room
+INSERT INTO Joins VALUES(3,'2022-05-10', '09:00:00', 2, 25); -- to simulate initial booking of Videoconferencing Room
