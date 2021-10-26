@@ -158,9 +158,12 @@ DECLARE
     cap INTEGER;
 BEGIN
     
-    IF (EXISTS(SELECT 1 FROM Sessions WHERE sdate = mdate AND stime = mshour AND sroom = mroom AND sfloor = mfloor AND approval_status IS NULL)) THEN
+    IF ((EXISTS(SELECT 1 FROM Sessions WHERE sdate = mdate AND stime = mshour AND sroom = mroom AND sfloor = mfloor AND approval_status IS NULL)) 
+    AND (NOT EXISTS(SELECT 1 FROM Joins WHERE eid = emp AND sdate = mdate AND stime = mshour AND sroom = mroom AND sfloor = mfloor))) THEN
+
         --SELECT u.capacity INTO cap FROM Updates u WHERE room = mroom AND floor = mfloor ORDER BY udate DESC LIMIT 1;
-        SELECT rcapacity INTO cap FROM MeetingRooms WHERE room = mroom AND floor = mfloor;
+        --SELECT rcapacity INTO cap FROM MeetingRooms WHERE room = mroom AND floor = mfloor;
+		SELECT u.capacity INTO cap FROM Updates u WHERE (u.udate = (SELECT MAX(udate) FROM Updates WHERE room = mroom AND floor = mfloor));
         IF ((SELECT s.participants FROM Sessions s WHERE sdate = mdate AND stime = mshour AND sroom = mroom AND sfloor = mfloor) < cap) THEN
             WHILE temp < mehour LOOP
                 INSERT INTO Joins
@@ -179,27 +182,28 @@ BEGIN
             RAISE NOTICE 'room capacity reached';
         END IF;
     ELSE 
-        RAISE NOTICE 'session does not exist or has already been finalized';
+        RAISE NOTICE 'session does not exist or has already been finalized or employee already joined';
 
     END IF;
 
 END;
 $$ LANGUAGE plpgsql;
 
--- book_room needs to call join meeting as well
+-- book_room needs to call join meeting as well since employee who booked is considered a participant
 -- function assumes that if the meeting exists, that the end hour is correct.
 /*---------------------------------------------------------*/
 
 -- leave_meeting
 
-CREATE OR REPLACE PROCEDURE leave_meeting
+CCREATE OR REPLACE PROCEDURE leave_meeting
 (mfloor INTEGER, mroom INTEGER, mdate DATE, mshour TIME, mehour TIME, emp INTEGER)
 AS $$
 DECLARE
     temp TIME := mshour;
 BEGIN
 
-    IF (EXISTS(SELECT 1 FROM Sessions WHERE sdate = mdate AND stime = mshour AND sroom = mroom AND sfloor = mfloor AND approval_status IS NULL)) THEN
+    IF ((EXISTS(SELECT 1 FROM Sessions WHERE sdate = mdate AND stime = mshour AND sroom = mroom AND sfloor = mfloor AND approval_status IS NULL)) 
+    AND (EXISTS(SELECT 1 FROM Joins WHERE eid = emp AND sdate = mdate AND stime = mshour AND sroom = mroom AND sfloor = mfloor))) THEN
 
         WHILE temp < mehour LOOP
             DELETE FROM Joins 
@@ -221,7 +225,7 @@ BEGIN
         END LOOP;
 
     ELSE 
-        RAISE NOTICE 'session does not exist or has already been finalized';
+        RAISE NOTICE 'session does not exist or has already been finalized or employee is not part of meeting';
 
     END IF;
 
@@ -264,20 +268,21 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER reject_meeting
-AFTER INSERT OR UPDATE ON Sessions
-FOR EACH ROW WHEN (NEW.approval_status = 'rejected')
-EXECUTE FUNCTION delete_meeting();
-
 CREATE OR REPLACE FUNCTION delete_meeting() 
 RETURNS TRIGGER AS $$
 BEGIN
     DELETE FROM Sessions
-    WHERE approval_status = 'rejected'
+    WHERE NEW.approval_status = 'rejected'
     RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE TRIGGER reject_meeting
+BEFORE INSERT OR UPDATE ON Sessions
+FOR EACH ROW WHEN (NEW.approval_status = 'rejected')
+EXECUTE FUNCTION delete_meeting();
+
+-- trigger is not compiling
 -- employee must be a manager from the same department 
 /*---------------------------------------------------------*/
 

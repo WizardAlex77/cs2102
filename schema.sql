@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS Departments, HealthDeclarations, MeetingRooms,
+DROP TABLE IF EXISTS Departments, Employees, HealthDeclarations, MeetingRooms,
 Sessions, Joins, Updates cascade;
 
 /* ====================================== CREATE TABLES ====================================== */
