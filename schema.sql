@@ -46,7 +46,6 @@ CREATE TABLE MeetingRooms (
     floor INTEGER NOT NULL,
     room INTEGER NOT NULL,
     rname VARCHAR(255) NOT NULL,
-    rcapacity INTEGER,
     did INTEGER NOT NULL,
     PRIMARY KEY (room, floor),
     CONSTRAINT did_constraint FOREIGN KEY (did) REFERENCES Departments (did)
@@ -95,9 +94,9 @@ CREATE TABLE Joins (
 /*---------------------------------------------------------*/
 
 CREATE TABLE Updates (
-    udate DATE NOT NULL,
-    room INTEGER NOT NULL,
+    udate DATE NOT NULL DEFAULT CURRENT_DATE,
     floor INTEGER NOT NULL,
+    room INTEGER NOT NULL,
     capacity INTEGER NOT NULL,
     PRIMARY KEY (udate, room, floor),
     CONSTRAINT meetingroom_constraint FOREIGN KEY (room, floor) REFERENCES MeetingRooms (room, floor)

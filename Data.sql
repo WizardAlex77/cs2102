@@ -7,22 +7,35 @@ INSERT INTO Employees VALUES (4, 'Kevin', 'kevin@gmail.com', 'Junior', 3, 888899
 
 
 -- ACCOUNTING MEETING ROOMS
-insert into MeetingRooms values (1, 11, 'Reception Room', 10, 1);
-insert into MeetingRooms values (1, 21, 'Conferencing Room', 20, 1);
-insert into MeetingRooms values (1, 31, 'Finance Meeting Room', 15, 1);
-insert into MeetingRooms values (2, 13, 'Auditorium', 100, 1);
+insert into MeetingRooms values (1, 11, 'Reception Room', 1);
+insert into Updates (floor, room, capacity) values (1, 11, 10);
+insert into MeetingRooms values (1, 21, 'Conferencing Room', 1);
+insert into Updates (floor, room, capacity) values (1, 21, 20);
+insert into MeetingRooms values (1, 31, 'Finance Meeting Room', 1);
+insert into Updates (floor, room, capacity) values (1, 31, 15);
+insert into MeetingRooms values (2, 13, 'Auditorium', 1);
+insert into Updates (floor, room, capacity) values (2, 13, 100);
 
 -- HUMAN RESOURCES MEETING ROOMS
-insert into MeetingRooms values (2, 22, 'HR Conferencing Room', 20, 2);
-insert into MeetingRooms values (2, 25, 'Videoconferencing Room', 30, 2);
-insert into MeetingRooms values (3, 11, 'Specialists Meeting Room', 15, 2);
-insert into MeetingRooms values (3, 14, 'Reception Room', 10, 2);
+insert into MeetingRooms values (2, 22, 'HR Conferencing Room', 2);
+insert into Updates (floor, room, capacity) values (2, 22, 20);
+insert into MeetingRooms values (2, 25, 'Videoconferencing Room', 2);
+insert into Updates (floor, room, capacity) values (2, 25, 30);
+insert into MeetingRooms values (3, 11, 'Specialists Meeting Room', 2);
+insert into Updates (floor, room, capacity) values (3, 11, 15);
+insert into MeetingRooms values (3, 14, 'Reception Room', 2);
+insert into Updates (floor, room, capacity) values (3, 14, 10);
 
 -- MARKETING MEETING ROOMS
-insert into MeetingRooms values (3, 26, 'Specialists Meeting Room', 16, 3);
-insert into MeetingRooms values (3, 32, 'Hollow Square Room', 9, 3);
+insert into MeetingRooms values (3, 26, 'Specialists Meeting Room', 3);
+insert into Updates (floor, room, capacity) values (3, 26, 16);
+insert into MeetingRooms values (3, 32, 'Hollow Square Room', 3);
+insert into Updates (floor, room, capacity) values (3, 32, 9);
 
 -- IT MEETING ROOMS
-insert into MeetingRooms values (4, 11, 'Database Meeting Room', 40, 4);
-insert into MeetingRooms values (4, 17, 'Database Meeting Room', 30, 4);
-insert into MeetingRooms values (4, 34, 'Videoconferencing Room', 32, 4);
+insert into MeetingRooms values (4, 11, 'Database Meeting Room', 4);
+insert into Updates (floor, room, capacity) values (4, 11, 40);
+insert into MeetingRooms values (4, 17, 'Database Meeting Room', 4);
+insert into Updates (floor, room, capacity) values (4, 17, 30);
+insert into MeetingRooms values (4, 34, 'Videoconferencing Room', 4);
+insert into Updates (floor, room, capacity) values (4, 34, 32);
