@@ -11,7 +11,7 @@ CREATE TABLE Departments (
 /*---------------------------------------------------------*/
 
 CREATE TABLE Employees (
-    eid INTEGER SERIAL PRIMARY KEY,
+    eid SERIAL PRIMARY KEY,
     ename VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     etype VARCHAR(10) NOT NULL,

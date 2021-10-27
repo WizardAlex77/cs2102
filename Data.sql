@@ -20,7 +20,7 @@ insert into Updates (floor, room, capacity) values (2, 13, 100);
 insert into MeetingRooms values (2, 22, 'HR Conferencing Room', 2);
 insert into Updates (floor, room, capacity) values (2, 22, 20);
 insert into MeetingRooms values (2, 23, 'HR private room', 2); -- room with small capacity for testing purposes
-insert into Updates (floor, room, capacity) values (2, 23, 2)
+insert into Updates (floor, room, capacity) values (2, 23, 2);
 insert into MeetingRooms values (2, 25, 'Videoconferencing Room', 2);
 insert into Updates (floor, room, capacity) values (2, 25, 30);
 insert into MeetingRooms values (3, 11, 'Specialists Meeting Room', 2);
