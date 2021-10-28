@@ -163,7 +163,7 @@ BEGIN
 
         --SELECT u.capacity INTO cap FROM Updates u WHERE room = mroom AND floor = mfloor ORDER BY udate DESC LIMIT 1;
         --SELECT rcapacity INTO cap FROM MeetingRooms WHERE room = mroom AND floor = mfloor;
-		SELECT u.capacity INTO cap FROM Updates u WHERE (u.udate = (SELECT MAX(udate) FROM Updates WHERE room = mroom AND floor = mfloor));
+		SELECT u.capacity INTO cap FROM Updates u WHERE u.udate = (SELECT MAX(udate) FROM Updates WHERE room = mroom AND floor = mfloor) AND room = mroom AND floor = mfloor;
         IF ((SELECT s.participants FROM Sessions s WHERE sdate = mdate AND stime = mshour AND sroom = mroom AND sfloor = mfloor) < cap) THEN
             WHILE temp < mehour LOOP
                 INSERT INTO Joins
@@ -195,7 +195,7 @@ $$ LANGUAGE plpgsql;
 
 -- leave_meeting
 
-CCREATE OR REPLACE PROCEDURE leave_meeting
+CREATE OR REPLACE PROCEDURE leave_meeting
 (mfloor INTEGER, mroom INTEGER, mdate DATE, mshour TIME, mehour TIME, emp INTEGER)
 AS $$
 DECLARE
@@ -268,20 +268,32 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- CREATE OR REPLACE FUNCTION delete_meeting() 
+-- RETURNS TRIGGER AS $$
+-- BEGIN
+--     DELETE FROM Sessions
+--     WHERE approval_status = 'rejected';
+-- 	RETURN NEW;
+-- END;
+-- $$ LANGUAGE plpgsql;
+
+-- CREATE TRIGGER reject_meeting
+-- AFTER INSERT OR UPDATE ON Sessions
+-- --FOR EACH ROW WHEN (NEW.approval_status = 'rejected')
+-- EXECUTE PROCEDURE delete_meeting();
+
 CREATE OR REPLACE FUNCTION delete_meeting() 
 RETURNS TRIGGER AS $$
 BEGIN
     DELETE FROM Sessions
-    WHERE NEW.approval_status = 'rejected'
-    RETURN NULL;
+    WHERE approval_status = 'rejected';
+  RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER reject_meeting
-BEFORE INSERT OR UPDATE ON Sessions
-FOR EACH ROW WHEN (NEW.approval_status = 'rejected')
-EXECUTE FUNCTION delete_meeting();
-
+AFTER INSERT OR UPDATE ON Sessions
+EXECUTE PROCEDURE delete_meeting();
 -- trigger is not compiling
 -- employee must be a manager from the same department 
 /*---------------------------------------------------------*/
