@@ -92,19 +92,19 @@ $$ LANGUAGE plpgsql;
 
 --add_employee
 
-CREATE OR REPLACE PROCEDURE add_employee(employee_name VARCHAR(255), employee_type VARCHAR(10), department_name VARCHAR(255),
-    mobile_num INTEGER, office_num INTEGER, home_num INTEGER)
+-- CREATE OR REPLACE PROCEDURE add_employee(employee_name VARCHAR(255), employee_type VARCHAR(10), department_name VARCHAR(255),
+--     mobile_num INTEGER, office_num INTEGER, home_num INTEGER)
 
-AS $$
-DECLARE
-	department_id INTEGER;
-	employee_email VARCHAR(255);
-BEGIN
-	select concat(employee_name, );
+-- AS $$
+-- DECLARE
+-- 	department_id INTEGER;
+-- 	employee_email VARCHAR(255);
+-- BEGIN
+-- 	select concat(employee_name, );
  
-	select d_id into department_id from find_department_id(department_name);
-	insert into Employees (email, etype, did, mp_num, op_num, hp_num, resignation_date)
-	values ()
+-- 	select d_id into department_id from find_department_id(department_name);
+-- 	insert into Employees (email, etype, did, mp_num, op_num, hp_num, resignation_date)
+-- 	values ()
 
 -- eid INTEGER SERIAL PRIMARY KEY,
 --     ename VARCHAR(255) NOT NULL, -> auto generated
@@ -115,19 +115,19 @@ BEGIN
 --     op_num INTEGER,
 --     hp_num INTEGER,
 --     resignation_date DATE,
-END
-$$ LANGUAGE plpgsql;
+-- END
+-- $$ LANGUAGE plpgsql;
 
---helper method
-CREATE OR REPLACE FUNCTION find_department_id(IN department_name VARCHAR(255), OUT d_id INTEGER)
-RETURNS INTEGER AS $$
-BEGIN
-	select did into d_id 
-	from Departments 
-	where dname = department_name;
+-- --helper method
+-- CREATE OR REPLACE FUNCTION find_department_id(IN department_name VARCHAR(255), OUT d_id INTEGER)
+-- RETURNS INTEGER AS $$
+-- BEGIN
+-- 	select did into d_id 
+-- 	from Departments 
+-- 	where dname = department_name;
 
-END;
-$$ LANGUAGE plpgsql;
+-- END;
+-- $$ LANGUAGE plpgsql;
 
 /*---------------------------------------------------------*/
 
@@ -250,14 +250,14 @@ BEGIN
                 UPDATE Sessions
                 SET approval_status = decision
                 WHERE sdate = mdate
-                AND stime = mshour
+                AND stime = temp
                 AND sroom = mroom
                 AND sfloor = mfloor;
                 temp := temp + interval '1 hour';
             END LOOP;
         
         ELSE 
-            RAISE NOTICE 'approver does not have approval rights for this room';
+            RAISE NOTICE 'employee does not have approval rights for this room';
 
         END IF;
 
@@ -267,20 +267,6 @@ BEGIN
     END IF;
 END;
 $$ LANGUAGE plpgsql;
-
--- CREATE OR REPLACE FUNCTION delete_meeting() 
--- RETURNS TRIGGER AS $$
--- BEGIN
---     DELETE FROM Sessions
---     WHERE approval_status = 'rejected';
--- 	RETURN NEW;
--- END;
--- $$ LANGUAGE plpgsql;
-
--- CREATE TRIGGER reject_meeting
--- AFTER INSERT OR UPDATE ON Sessions
--- --FOR EACH ROW WHEN (NEW.approval_status = 'rejected')
--- EXECUTE PROCEDURE delete_meeting();
 
 CREATE OR REPLACE FUNCTION delete_meeting() 
 RETURNS TRIGGER AS $$
@@ -294,7 +280,7 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER reject_meeting
 AFTER INSERT OR UPDATE ON Sessions
 EXECUTE PROCEDURE delete_meeting();
--- trigger is not compiling
+
 -- employee must be a manager from the same department 
 /*---------------------------------------------------------*/
 
@@ -454,6 +440,9 @@ AFTER DELETE ON Joins
 FOR EACH ROW EXECUTE FUNCTION detect_booker();
 
 /*---------------------------------------------------------*/
+/*---------------------------------------------------------*/
+/* ADMIN */
+/*---------------------------------------------------------*/
 
 CREATE OR REPLACE FUNCTION non_compliance 
 (IN StartDate DATE, IN EndDate DATE)
@@ -478,5 +467,19 @@ RETURNS TABLE(Floor_number INTEGER, Room_number INTEGER, Date DATE, Start_hour T
 	AND sdate >= StartDate
 	ORDER BY sdate ASC, stime ASC;
 $$ language sql;
+
+/*---------------------------------------------------------*/
+
+CREATE OR REPLACE FUNCTION view_future_meeting
+(IN startDate DATE, IN EmployeeID INTEGER)
+RETURNS TABLE(Floor_number INTEGER, Room_number INTEGER, Date DATE, Start_hour TIME) AS $$
+
+	SELECT sfloor, sroom, sdate, stime
+	FROM Sessions NATURAL JOIN Joins
+	WHERE approval_status = 'approved'
+	AND eid = EmployeeID
+	AND sdate >= startDate
+	ORDER BY sdate ASC, stime ASC;
+$$ LANGUAGE sql;
 
 
