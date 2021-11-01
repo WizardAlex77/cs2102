@@ -1,5 +1,4 @@
-DROP TABLE IF EXISTS Departments, HealthDeclarations, MeetingRooms,
-Sessions, Joins, Updates cascade;
+DROP TABLE IF EXISTS Departments, HealthDeclarations, MeetingRooms, Employees, Sessions, Joins, Updates cascade;
 
 /* ====================================== CREATE TABLES ====================================== */
 
@@ -11,12 +10,12 @@ CREATE TABLE Departments (
 /*---------------------------------------------------------*/
 
 CREATE TABLE Employees (
-    eid INTEGER SERIAL PRIMARY KEY,
+    eid INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     ename VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     etype VARCHAR(10) NOT NULL,
     did INTEGER NOT NULL,
-    mp_num INTEGER,
+    mp_num INTEGER UNIQUE,
     op_num INTEGER,
     hp_num INTEGER,
     resignation_date DATE,
@@ -95,7 +94,7 @@ CREATE TABLE Joins (
 /*---------------------------------------------------------*/
 
 CREATE TABLE Updates (
-    udate DATE NOT NULL DEFAULT CURRENT_DATE,
+    udate TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     floor INTEGER NOT NULL,
     room INTEGER NOT NULL,
     capacity INTEGER NOT NULL,

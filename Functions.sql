@@ -27,8 +27,10 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE PROCEDURE remove_department(department_id_to_remove INTEGER, new_department_id INTEGER)
 AS $$
 DECLARE
-	curs CURSOR FOR (select e.eid, e.did from Employees e where e.did = department_id_to_remove);
+	curs1 CURSOR FOR (select e.eid, e.did from Employees e where e.did = department_id_to_remove);
 	r1 RECORD;
+	curs2 CURSOR FOR (select m.floor, m.room, m.did from MeetingRooms m where m.did = department_id_to_remove);
+	r2 RECORD;
 BEGIN
 	IF (NOT EXISTS(select 1 from Departments where Departments.did = department_id_to_remove)) THEN
 		RAISE EXCEPTION 'Department to be removed does not exist!';
@@ -39,12 +41,22 @@ BEGIN
 	END IF;
 
 	-- loop through employees in old department
-	OPEN curs;
+	OPEN curs1;
 	LOOP
-		FETCH curs INTO r1; 
+		FETCH curs1 INTO r1; 
 		EXIT WHEN NOT FOUND;
 		update Employees set did = new_department_id where eid = r1.eid;
 	END LOOP;
+
+	-- loop through meetingrooms in old department
+	OPEN curs2;
+	LOOP
+		FETCH curs2 INTO r2;
+		EXIT WHEN NOT FOUND;
+		update MeetingRooms set did = new_department_id where floor = r2.floor and room = r2.room;
+	END LOOP;
+
+	DELETE FROM Departments WHERE did = department_id_to_remove;
 	RAISE NOTICE 'Department deleted successfully!';
 END;
 $$ LANGUAGE plpgsql;
@@ -75,59 +87,59 @@ $$ LANGUAGE plpgsql;
 /*---------------------------------------------------------*/
 
 --change_capacity
-CREATE OR REPLACE PROCEDURE change_capacity(floor_number INTEGER, room_number INTEGER, new_capacity INTEGER, date_changed DATE)
+CREATE OR REPLACE PROCEDURE change_capacity(floor_number INTEGER, room_number INTEGER, new_capacity INTEGER, date_changed TIMESTAMP, employee_id INTEGER)
 AS $$
 BEGIN
 	IF (NOT EXISTS(select 1 from MeetingRooms where room = room_number AND floor = floor_number)) THEN
 		RAISE EXCEPTION 'Meeting room does not exist!';
 	ELSE
-		update Updates set capacity = new_capacity where floor = floor_number and room = room_number;
-		update Updates set udate = date_changed where floor = floor_number and room = room_number;
-		RAISE NOTICE 'Meeting room capacity for #%-% has been changed!', floor_number, room_number; 
+		IF (NOT EXISTS(select 1 from Employees where eid = employee_id)) THEN
+			RAISE EXCEPTION 'Employee record does not exist!'; 
+		ELSE
+			IF ((select e.etype from Employees e where e.eid = employee_id) = 'Manager') THEN
+				insert into Updates values (date_changed, floor_number, room_number, new_capacity);
+				RAISE NOTICE 'Meeting room capacity for #%-% has been updated!', floor_number, room_number;
+			ELSE
+				RAISE EXCEPTION 'Only a MANAGER can change room capacity.';
+			END IF;
+		END IF;
 	END IF;
-END
+END;
 $$ LANGUAGE plpgsql;
 
 /*---------------------------------------------------------*/
 
 --add_employee
 
-CREATE OR REPLACE PROCEDURE add_employee(employee_name VARCHAR(255), employee_type VARCHAR(10), department_name VARCHAR(255),
+CREATE OR REPLACE PROCEDURE add_employee(employee_name VARCHAR(255), employee_type VARCHAR(10), department_id INTEGER,
     mobile_num INTEGER, office_num INTEGER, home_num INTEGER)
-
 AS $$
-DECLARE
-	department_id INTEGER;
-	employee_email VARCHAR(255);
 BEGIN
-	select concat(employee_name, );
- 
-	select d_id into department_id from find_department_id(department_name);
-	insert into Employees (email, etype, did, mp_num, op_num, hp_num, resignation_date)
-	values ()
-
--- eid INTEGER SERIAL PRIMARY KEY,
---     ename VARCHAR(255) NOT NULL, -> auto generated
---     email VARCHAR(255) UNIQUE NOT NULL, -> auto generated
---     etype VARCHAR(10) NOT NULL,
---     did INTEGER NOT NULL,
---     mp_num INTEGER,
---     op_num INTEGER,
---     hp_num INTEGER,
---     resignation_date DATE,
+	IF (NOT EXISTS(select 1 from Employees where mp_num = mobile_num)) THEN
+		IF (employee_type not in ('Manager', 'Junior', 'Senior')) THEN
+			RAISE EXCEPTION 'Employee type is invalid.';
+		ELSE
+			insert into Employees (ename, email, etype, did, mp_num, op_num, hp_num)
+			values (employee_name, 'temp@company.com', employee_type, department_id, mobile_num, office_num, home_num);
+			RAISE NOTICE 'Employee record created successfully!';
+		END IF;
+	ELSE
+		RAISE EXCEPTION 'Employee record already exists!'; -- check error
+	END IF;
 END
 $$ LANGUAGE plpgsql;
 
---helper method
-CREATE OR REPLACE FUNCTION find_department_id(IN department_name VARCHAR(255), OUT d_id INTEGER)
-RETURNS INTEGER AS $$
+CREATE OR REPLACE FUNCTION generate_employee_email()
+RETURNS TRIGGER AS $$
 BEGIN
-	select did into d_id 
-	from Departments 
-	where dname = department_name;
-
+	update Employees set email = (concat(replace(lower(NEW.ename), ' ', ''), '_', NEW.eid,'@company.com')) where eid = NEW.eid;
+	RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE TRIGGER add_employee_email
+AFTER INSERT ON Employees
+FOR EACH ROW EXECUTE FUNCTION generate_employee_email();
 
 /*---------------------------------------------------------*/
 
@@ -139,7 +151,7 @@ BEGIN
 		RAISE EXCEPTION 'Employee does not exist!';
 	ELSE
 		update Employees set resignation_date = last_day_of_work where eid = employee_id;
-		RAISE NOTICE 'Employee record % has been updated.', employee_id;
+		RAISE NOTICE 'Employee % has resigned and record is updated.', employee_id;
 	END IF;
 END
 $$ LANGUAGE plpgsql;

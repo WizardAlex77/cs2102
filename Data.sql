@@ -1,9 +1,25 @@
-INSERT INTO Departments VALUES (1, 'Accounting'), (2, 'Human Resources'), (3, 'Marketing'), (4, 'Technology and Equipment');
+INSERT INTO Departments VALUES (1, 'Accounting'), (2, 'Human Resources'), (3, 'Advertising'), (4, 'Technology and Equipment');
 
-INSERT INTO Employees VALUES (1, 'Grace', 'grace@gmail.com', 'Junior', 1, 98765432);
-INSERT INTO Employees VALUES (2, 'Natalie', 'natalie@gmail.com', 'Manager', 2, 12345678);
-INSERT INTO Employees VALUES (3, 'Gareth', 'gareth@gmail.com','Senior', 1, 99998888);
-INSERT INTO Employees VALUES (4, 'Kevin', 'kevin@gmail.com', 'Junior', 3, 88889999);
+-- JUNIOR EMPLOYEES
+INSERT INTO Employees (ename, email, etype, did, mp_num) VALUES ('Grace Li', 'graceli_1@company.com', 'Junior', 1, 98765432);
+INSERT INTO Employees (ename, email, etype, did, mp_num, op_num) VALUES ('Kevin Quek', 'kevinquek_2@company.com', 'Junior', 1, 88889999, 65553922);
+INSERT INTO Employees (ename, email, etype, did, mp_num) VALUES ('Ravi Kumar', 'ravikumar_3@company.com', 'Junior', 2, 92424312);
+INSERT INTO Employees (ename, email, etype, did, mp_num, hp_num) VALUES ('Lucy Liu', 'lucyliu_4@company.com', 'Junior', 2, 89024951, 69750864);
+INSERT INTO Employees (ename, email, etype, did, mp_num) VALUES ('Nico Williams', 'nicowilliams_5@company.com', 'Junior', 3, 88370183);
+INSERT INTO Employees (ename, email, etype, did, mp_num) VALUES ('Francis Tan Wei Jie', 'francistanweijie_6@company.com', 'Junior', 4, 91047205);
+INSERT INTO Employees (ename, email, etype, did, mp_num, hp_num) VALUES ('Lucas Hwang', 'lucashwang_7@company.com', 'Junior', 4, 92119942, 64564567);
+
+--SENIOR EMPLOYEES
+INSERT INTO Employees (ename, email, etype, did, mp_num) VALUES ('Gareth Koh', 'garethkoh_8@company.com','Senior', 1, 99998888);
+INSERT INTO Employees (ename, email, etype, did, mp_num, hp_num) VALUES ('Daphne Chua', 'daphnechua_9@company.com','Senior', 2, 90001421, 60293333);
+INSERT INTO Employees (ename, email, etype, did, mp_num) VALUES ('Kailash Grewal', 'kailashgrewal_10@company.com', 'Senior', 3, 92045667);
+INSERT INTO Employees (ename, email, etype, did, mp_num, hp_num) VALUES ('Rajab bin Razeen', 'rajabbinrazeen_11@company.com', 'Senior', 4, 89204819, 61123345);
+
+-- MANAGER EMPLOYEES
+INSERT INTO Employees (ename, email, etype, did, mp_num, op_num, hp_num) VALUES ('Natalie Gordon', 'nataliegordon_12@company.com', 'Manager', 1, 92345678, 67771111, 60992221);
+INSERT INTO Employees (ename, email, etype, did, mp_num, op_num) VALUES ('Esther Bell', 'estherbell_13@company.com', 'Manager', 2, 87653456, 68820011);
+INSERT INTO Employees (ename, email, etype, did, mp_num, op_num, hp_num) VALUES ('Chan Yu Xin', 'chanyuxin_14@company.com', 'Manager', 3, 96745221, 63312254, 61123009);
+INSERT INTO Employees (ename, email, etype, did, mp_num, op_num) VALUES ('Diti Sankar', 'ditisankar_15@company.com', 'Manager', 4, 91914081, 60090002);
 
 
 -- ACCOUNTING MEETING ROOMS
@@ -20,7 +36,7 @@ insert into Updates (floor, room, capacity) values (2, 13, 100);
 insert into MeetingRooms values (2, 22, 'HR Conferencing Room', 2);
 insert into Updates (floor, room, capacity) values (2, 22, 20);
 insert into MeetingRooms values (2, 23, 'HR private room', 2); -- room with small capacity for testing purposes
-insert into Updates (floor, room, capacity) values (2, 23, 2)
+insert into Updates (floor, room, capacity) values (2, 23, 2);
 insert into MeetingRooms values (2, 25, 'Videoconferencing Room', 2);
 insert into Updates (floor, room, capacity) values (2, 25, 30);
 insert into MeetingRooms values (3, 11, 'Specialists Meeting Room', 2);
