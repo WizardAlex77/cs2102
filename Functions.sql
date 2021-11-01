@@ -170,9 +170,12 @@ DECLARE
     cap INTEGER;
 BEGIN
     
-    IF (EXISTS(SELECT 1 FROM Sessions WHERE sdate = mdate AND stime = mshour AND sroom = mroom AND sfloor = mfloor AND approval_status IS NULL)) THEN
+    IF ((EXISTS(SELECT 1 FROM Sessions WHERE sdate = mdate AND stime = mshour AND sroom = mroom AND sfloor = mfloor AND approval_status IS NULL)) 
+    AND (NOT EXISTS(SELECT 1 FROM Joins WHERE eid = emp AND sdate = mdate AND stime = mshour AND sroom = mroom AND sfloor = mfloor))) THEN
+
         --SELECT u.capacity INTO cap FROM Updates u WHERE room = mroom AND floor = mfloor ORDER BY udate DESC LIMIT 1;
-        SELECT rcapacity INTO cap FROM MeetingRooms WHERE room = mroom AND floor = mfloor;
+        --SELECT rcapacity INTO cap FROM MeetingRooms WHERE room = mroom AND floor = mfloor;
+		SELECT u.capacity INTO cap FROM Updates u WHERE u.udate = (SELECT MAX(udate) FROM Updates WHERE room = mroom AND floor = mfloor) AND room = mroom AND floor = mfloor;
         IF ((SELECT s.participants FROM Sessions s WHERE sdate = mdate AND stime = mshour AND sroom = mroom AND sfloor = mfloor) < cap) THEN
             WHILE temp < mehour LOOP
                 INSERT INTO Joins
@@ -191,14 +194,14 @@ BEGIN
             RAISE NOTICE 'room capacity reached';
         END IF;
     ELSE 
-        RAISE NOTICE 'session does not exist or has already been finalized';
+        RAISE NOTICE 'session does not exist or has already been finalized or employee already joined';
 
     END IF;
 
 END;
 $$ LANGUAGE plpgsql;
 
--- book_room needs to call join meeting as well
+-- book_room needs to call join meeting as well since employee who booked is considered a participant
 -- function assumes that if the meeting exists, that the end hour is correct.
 /*---------------------------------------------------------*/
 
@@ -211,7 +214,8 @@ DECLARE
     temp TIME := mshour;
 BEGIN
 
-    IF (EXISTS(SELECT 1 FROM Sessions WHERE sdate = mdate AND stime = mshour AND sroom = mroom AND sfloor = mfloor AND approval_status IS NULL)) THEN
+    IF ((EXISTS(SELECT 1 FROM Sessions WHERE sdate = mdate AND stime = mshour AND sroom = mroom AND sfloor = mfloor AND approval_status IS NULL)) 
+    AND (EXISTS(SELECT 1 FROM Joins WHERE eid = emp AND sdate = mdate AND stime = mshour AND sroom = mroom AND sfloor = mfloor))) THEN
 
         WHILE temp < mehour LOOP
             DELETE FROM Joins 
@@ -233,7 +237,7 @@ BEGIN
         END LOOP;
 
     ELSE 
-        RAISE NOTICE 'session does not exist or has already been finalized';
+        RAISE NOTICE 'session does not exist or has already been finalized or employee is not part of meeting';
 
     END IF;
 
@@ -276,20 +280,33 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER reject_meeting
-AFTER INSERT OR UPDATE ON Sessions
-FOR EACH ROW WHEN (NEW.approval_status = 'rejected')
-EXECUTE FUNCTION delete_meeting();
+-- CREATE OR REPLACE FUNCTION delete_meeting() 
+-- RETURNS TRIGGER AS $$
+-- BEGIN
+--     DELETE FROM Sessions
+--     WHERE approval_status = 'rejected';
+-- 	RETURN NEW;
+-- END;
+-- $$ LANGUAGE plpgsql;
+
+-- CREATE TRIGGER reject_meeting
+-- AFTER INSERT OR UPDATE ON Sessions
+-- --FOR EACH ROW WHEN (NEW.approval_status = 'rejected')
+-- EXECUTE PROCEDURE delete_meeting();
 
 CREATE OR REPLACE FUNCTION delete_meeting() 
 RETURNS TRIGGER AS $$
 BEGIN
     DELETE FROM Sessions
-    WHERE approval_status = 'rejected'
-    RETURN NULL;
+    WHERE approval_status = 'rejected';
+  RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE TRIGGER reject_meeting
+AFTER INSERT OR UPDATE ON Sessions
+EXECUTE PROCEDURE delete_meeting();
+-- trigger is not compiling
 -- employee must be a manager from the same department 
 /*---------------------------------------------------------*/
 
@@ -331,20 +348,31 @@ CREATE OR REPLACE FUNCTION contact_tracing
 RETURNS TABLE(ContactEmployeeID INTEGER) AS $$
 DECLARE 
 	curs CURSOR FOR (SELECT * FROM 
-						(SELECT DISTINCT J.eid FROM Joins J, 
-						(SELECT sdate, stime, sroom, sfloor FROM Joins WHERE eid = EmployeeID AND sdate >= (date CDate - integer '3') AND sdate <= CDate) PCase
-				 		WHERE J.eid <> EmployeeID 
-				 		AND J.sdate = PCase.sdate 
-				 		AND J.stime = PCase.stime 
-				 		AND J.sroom = PCase.sroom
-						AND J.sfloor = PCase.sfloor) FPCase
-					 );
+		(SELECT DISTINCT J.eid FROM Joins J, 
+			(SELECT sdate, stime, sroom, sfloor 
+			FROM Joins J1
+			WHERE eid = EmployeeID 
+			AND sdate >= (CDate - integer '3') 
+			AND sdate <= CDate
+			AND EXISTS(SELECT 1 FROM Sessions S
+				WHERE J1.sdate = S.sdate
+				AND J1.stime = S.stime 
+				AND J1.sroom = S.sroom
+				AND J1.sfloor = S.sfloor
+				AND S.approval_status = 'approved')) PCase
+		WHERE J.eid <> EmployeeID 
+		AND J.sdate = PCase.sdate 
+		AND J.stime = PCase.stime 
+		AND J.sroom = PCase.sroom
+		AND J.sfloor = PCase.sfloor) FPCase
+	);
 	r1 RECORD;
 BEGIN
 	OPEN curs;
 	
 	LOOP
 		FETCH curs INTO r1;
+		ContactEmployeeID := r1.eid;
 		EXIT WHEN NOT FOUND;
 		CALL contact_tracing_helper(r1.eid, CDate);
 		RETURN NEXT;
@@ -387,7 +415,6 @@ $$ language plpgsql;
 
 /*---------------------------------------------------------*/
 
-
 --This trigger and trigger function serves to toggle the fever field of a newly inserted declaration in HealthDeclarations to true/false 
 --Condition : Temperature must be 37.5 or above to have a fever
 
@@ -406,9 +433,6 @@ FOR EACH ROW EXECUTE FUNCTION detect_fever();
 
 /*---------------------------------------------------------*/
 
---unsure of how this functionality is supposed to work, waiting for prof reply
-
-/*
 --This trigger and trigger function serves to detect if the booker has been removed from a meeting
 --If so, removes all participants from the meeting and disbands the meeting
 --Condition : No eid = booker id in Joins for a particular Session.
@@ -417,20 +441,22 @@ FOR EACH ROW EXECUTE FUNCTION detect_fever();
 CREATE OR REPLACE FUNCTION detect_booker() RETURNS TRIGGER AS $$
 BEGIN
 	IF EXISTS (SELECT 1 FROM Sessions S
-				WHERE OLD.eid = S.bookerid
-				AND OLD.sdate = S.sdate
-				AND OLD.stime = S.stime
-				AND OLD.sroom = S.sroom
-				AND OLD.sfloor = S.sfloor)
+		WHERE OLD.eid = S.bookerid
+		AND OLD.sdate = S.sdate
+		AND OLD.stime = S.stime
+		AND OLD.sroom = S.sroom
+		AND OLD.sfloor = S.sfloor)
 	THEN 
-		DELETE FROM Joins WHERE OLD.sdate = sdate
-							AND OLD.stime = stime
-							AND OLD.sroom = sroom
-							AND OLD.sfloor = sfloor;
-		DELETE FROM Sessions WHERE OLD.sdate = sdate
-							AND OLD.stime = stime
-							AND OLD.sroom = sroom
-							AND OLD.sfloor = sfloor;
+		DELETE FROM Joins 
+			WHERE OLD.sdate = sdate
+			AND OLD.stime = stime
+			AND OLD.sroom = sroom
+			AND OLD.sfloor = sfloor;
+		DELETE FROM Sessions 
+			WHERE OLD.sdate = sdate
+			AND OLD.stime = stime
+			AND OLD.sroom = sroom
+			AND OLD.sfloor = sfloor;
 END IF; RETURN OLD;
 END; 
 $$ LANGUAGE plpgsql;
@@ -438,5 +464,31 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER booker_detector
 AFTER DELETE ON Joins
 FOR EACH ROW EXECUTE FUNCTION detect_booker();
-*/
+
+/*---------------------------------------------------------*/
+
+CREATE OR REPLACE FUNCTION non_compliance 
+(IN StartDate DATE, IN EndDate DATE)
+RETURNS TABLE(EmployeeID INTEGER, Days INTEGER) AS $$
+	SELECT eid, ((EndDate - StartDate + 1) - count(*)) as days
+	FROM HealthDeclarations
+	WHERE ddate >= StartDate
+	AND ddate <= EndDate
+	GROUP BY eid 
+	HAVING (EndDate - StartDate + 1) - COUNT(*) > 0
+	ORDER BY days DESC;
+$$ language sql;
+
+/*---------------------------------------------------------*/
+
+CREATE OR REPLACE FUNCTION view_booking_report
+(IN StartDate DATE, IN EmployeeID INTEGER)
+RETURNS TABLE(Floor_number INTEGER, Room_number INTEGER, Date DATE, Start_hour TIME, Is_approved BOOLEAN) AS $$
+	SELECT sfloor, sroom, sdate, stime, CASE approval_status WHEN 'approved' THEN true ELSE false END
+	FROM Sessions
+	WHERE bookerid = EmployeeID
+	AND sdate >= StartDate
+	ORDER BY sdate ASC, stime ASC;
+$$ language sql;
+
 
