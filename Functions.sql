@@ -410,6 +410,7 @@ CREATE OR REPLACE FUNCTION detect_fever() RETURNS TRIGGER AS $$
 BEGIN
 	IF (NEW.temp >= 37.5) THEN
 		NEW.fever := true;
+		PERFORM contact_tracing(NEW.eid, NEW.ddate);
 	ELSE NEW.fever := false;
 	END IF; RETURN NEW;
 END;
