@@ -14,11 +14,12 @@ CALL add_room(1, 31, 'Finance Meeting Room', 15, 1); --expected to fail, room al
 CALL add_room(5, 09, 'Discussion Room', 30, 6); --expected to fail, department does not exist
 
 /* Function (4) change_capacity */
-CALL change_capacity(5, 12, 55, '2021-11-2 16:30:00', 12); --expected to pass
-CALL change_capacity(1, 11, 15, '2021-11-2 16:46:11', 15); --expected to pass
-CALL change_capacity(4, 18, 40, '2021-11-2 16:46:55', 12); --expected to fail, room does not exist
-CALL change_capacity(2, 22, 18, '2021-11-2 16:36:00', 1); --expected to fail, employee is not MANAGER
-CALL change_capacity(3, 26, 20, '2021-11-2 16:37:00', 99); --expected to fail, employee does not exist
+CALL change_capacity(5, 12, 55, '2021-11-3', 12); --expected to pass
+CALL change_capacity(1, 11, 15, '2021-11-20', 15); --expected to pass
+CALL change_capacity(1, 11, 5, '2021-11-20', 15); --expected to pass, same room updated on same day
+CALL change_capacity(4, 18, 40, '2021-12-5', 12); --expected to fail, room does not exist
+CALL change_capacity(2, 22, 18, '2021-12-2', 1); --expected to fail, employee is not MANAGER
+CALL change_capacity(3, 26, 20, '2021-12-2', 99); --expected to fail, employee does not exist
 
 /* Function (5) add_employee */
 CALL add_employee('Sally Tan Hui Yun', 'Junior', 5, 91010101, null, 62020202); --expected to pass

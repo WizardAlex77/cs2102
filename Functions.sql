@@ -87,7 +87,7 @@ $$ LANGUAGE plpgsql;
 /*---------------------------------------------------------*/
 
 --change_capacity
-CREATE OR REPLACE PROCEDURE change_capacity(floor_number INTEGER, room_number INTEGER, new_capacity INTEGER, date_changed TIMESTAMP, employee_id INTEGER)
+CREATE OR REPLACE PROCEDURE change_capacity(floor_number INTEGER, room_number INTEGER, new_capacity INTEGER, date_changed DATE, employee_id INTEGER)
 AS $$
 BEGIN
 	IF (NOT EXISTS(select 1 from MeetingRooms where room = room_number AND floor = floor_number)) THEN
@@ -97,8 +97,15 @@ BEGIN
 			RAISE EXCEPTION 'Employee record does not exist!'; 
 		ELSE
 			IF ((select e.etype from Employees e where e.eid = employee_id) = 'Manager') THEN
-				insert into Updates values (date_changed, floor_number, room_number, new_capacity);
-				RAISE NOTICE 'Meeting room capacity for #%-% has been updated!', floor_number, room_number;
+				IF (NOT EXISTS(select 1 from Updates where udate = date_changed)) THEN
+					--there has already been an update to room capacity on the same day
+					insert into Updates values (date_changed, floor_number, room_number, new_capacity);
+					RAISE NOTICE 'Meeting room capacity for #%-% has been updated!', floor_number, room_number;
+				ELSE
+					--eg. if manager made a mistake in setting new room capacity
+					update Updates set capacity = new_capacity where udate = date_changed;
+					RAISE NOTICE 'Meeting room capacity for #%-% has been updated!', floor_number, room_number;
+				END IF;
 			ELSE
 				RAISE EXCEPTION 'Only a MANAGER can change room capacity.';
 			END IF;

@@ -24,39 +24,39 @@ INSERT INTO Employees (ename, email, etype, did, mp_num, op_num) VALUES ('Diti S
 
 -- ACCOUNTING MEETING ROOMS
 insert into MeetingRooms values (1, 11, 'Reception Room', 1);
-insert into Updates (floor, room, capacity) values (1, 11, 10);
+insert into Updates values ('2021-10-1', 1, 11, 10);
 insert into MeetingRooms values (1, 21, 'Conferencing Room', 1);
-insert into Updates (floor, room, capacity) values (1, 21, 20);
+insert into Updates values ('2021-10-1', 1, 21, 20);
 insert into MeetingRooms values (1, 31, 'Finance Meeting Room', 1);
-insert into Updates (floor, room, capacity) values (1, 31, 15);
+insert into Updates values ('2021-10-1', 1, 31, 15);
 insert into MeetingRooms values (2, 13, 'Auditorium', 1);
-insert into Updates (floor, room, capacity) values (2, 13, 100);
+insert into Updates values ('2021-10-1', 2, 13, 100);
 
 -- HUMAN RESOURCES MEETING ROOMS
 insert into MeetingRooms values (2, 22, 'HR Conferencing Room', 2);
-insert into Updates (floor, room, capacity) values (2, 22, 20);
+insert into Updates values ('2021-10-1', 2, 22, 20);
 insert into MeetingRooms values (2, 23, 'HR private room', 2); -- room with small capacity for testing purposes
-insert into Updates (floor, room, capacity) values (2, 23, 2);
+insert into Updates values ('2021-10-1', 2, 23, 2);
 insert into MeetingRooms values (2, 25, 'Videoconferencing Room', 2);
-insert into Updates (floor, room, capacity) values (2, 25, 30);
+insert into Updates values ('2021-10-1', 2, 25, 30);
 insert into MeetingRooms values (3, 11, 'Specialists Meeting Room', 2);
-insert into Updates (floor, room, capacity) values (3, 11, 15);
+insert into Updates values ('2021-10-1', 3, 11, 15);
 insert into MeetingRooms values (3, 14, 'Reception Room', 2);
-insert into Updates (floor, room, capacity) values (3, 14, 10);
+insert into Updates values ('2021-10-1', 3, 14, 10);
 
 -- MARKETING MEETING ROOMS
 insert into MeetingRooms values (3, 26, 'Specialists Meeting Room', 3);
-insert into Updates (floor, room, capacity) values (3, 26, 16);
+insert into Updates values ('2021-10-1', 3, 26, 16);
 insert into MeetingRooms values (3, 32, 'Hollow Square Room', 3);
-insert into Updates (floor, room, capacity) values (3, 32, 9);
+insert into Updates values ('2021-10-1', 3, 32, 9);
 
 -- IT MEETING ROOMS
 insert into MeetingRooms values (4, 11, 'Database Meeting Room', 4);
-insert into Updates (floor, room, capacity) values (4, 11, 40);
+insert into Updates values ('2021-10-1', 4, 11, 40);
 insert into MeetingRooms values (4, 17, 'Database Meeting Room', 4);
-insert into Updates (floor, room, capacity) values (4, 17, 30);
+insert into Updates values ('2021-10-1', 4, 17, 30);
 insert into MeetingRooms values (4, 34, 'Videoconferencing Room', 4);
-insert into Updates (floor, room, capacity) values (4, 34, 32);
+insert into Updates values ('2021-10-1', 4, 34, 32);
 
 INSERT INTO Sessions VALUES ('2022-04-18', '08:00:00' , 2 , 22 , 2, 1, NULL); -- HR conferencing room
 INSERT INTO Sessions VALUES ('2022-04-10', '09:00:00' , 2 , 23 , 3, 1, NULL); -- HR private room

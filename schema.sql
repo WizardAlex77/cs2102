@@ -95,7 +95,7 @@ CREATE TABLE Joins (
 /*---------------------------------------------------------*/
 
 CREATE TABLE Updates (
-    udate TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    udate DATE NOT NULL DEFAULT CURRENT_DATE,
     floor INTEGER NOT NULL,
     room INTEGER NOT NULL,
     capacity INTEGER NOT NULL,
