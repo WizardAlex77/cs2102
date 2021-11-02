@@ -117,7 +117,15 @@ CALL approve_meeting(2, 22,'2022-04-18', '08:00:00', '09:00:00', 2, 'approved');
 CALL join_meeting(2, 22,'2022-04-18', '08:00:00', '09:00:00', 1); -- unsuccesful alr approved
 CALL approve_meeting(4, 17,'2022-05-10', '09:00:00', '10:00:00', 2, 'approved'); -- unsuccessful cos not own dept
 CALL approve_meeting(2, 23,'2022-04-10', '09:00:00', '10:00:00', 3, 'approved'); -- unsuccessful cos not a manager
-CALL approve_meeting(2, 23,'2022-04-10', '09:00:00', '10:00:00', 2, 'rejected'); -- successful (need to check)
+CALL approve_meeting(2, 23,'2022-04-10', '09:00:00', '10:00:00', 2, 'rejected'); -- successful
+
+CALL join_meeting(3, 11,'2022-10-29', '09:00:00', '12:00:00', 4); 
+CALL leave_meeting(3, 11,'2022-10-29', '09:00:00', '12:00:00', 4);
+CALL approve_meeting(3, 11,'2022-10-29', '09:00:00', '12:00:00', 2, 'approved');
+CALL approve_meeting(3, 32,'2022-10-31', '11:00:00', '14:00:00', 5, 'rejected');
+
+
+SELECT * FROM view_future_meeting(CAST('2022-04-10' AS DATE), 3);
 
 /* Function (15) declare_health */
 CALL declarehealth(4, '2021-10-16', 36.5); --expected to pass - correct

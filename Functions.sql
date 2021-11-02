@@ -92,19 +92,19 @@ $$ LANGUAGE plpgsql;
 
 --add_employee
 
-CREATE OR REPLACE PROCEDURE add_employee(employee_name VARCHAR(255), employee_type VARCHAR(10), department_name VARCHAR(255),
-    mobile_num INTEGER, office_num INTEGER, home_num INTEGER)
+-- CREATE OR REPLACE PROCEDURE add_employee(employee_name VARCHAR(255), employee_type VARCHAR(10), department_name VARCHAR(255),
+--     mobile_num INTEGER, office_num INTEGER, home_num INTEGER)
 
-AS $$
-DECLARE
-	department_id INTEGER;
-	employee_email VARCHAR(255);
-BEGIN
-	select concat(employee_name, );
+-- AS $$
+-- DECLARE
+-- 	department_id INTEGER;
+-- 	employee_email VARCHAR(255);
+-- BEGIN
+-- 	select concat(employee_name, );
  
-	select d_id into department_id from find_department_id(department_name);
-	insert into Employees (email, etype, did, mp_num, op_num, hp_num, resignation_date)
-	values ()
+-- 	select d_id into department_id from find_department_id(department_name);
+-- 	insert into Employees (email, etype, did, mp_num, op_num, hp_num, resignation_date)
+-- 	values ()
 
 -- eid INTEGER SERIAL PRIMARY KEY,
 --     ename VARCHAR(255) NOT NULL, -> auto generated
@@ -115,19 +115,19 @@ BEGIN
 --     op_num INTEGER,
 --     hp_num INTEGER,
 --     resignation_date DATE,
-END
-$$ LANGUAGE plpgsql;
+-- END
+-- $$ LANGUAGE plpgsql;
 
---helper method
-CREATE OR REPLACE FUNCTION find_department_id(IN department_name VARCHAR(255), OUT d_id INTEGER)
-RETURNS INTEGER AS $$
-BEGIN
-	select did into d_id 
-	from Departments 
-	where dname = department_name;
+-- --helper method
+-- CREATE OR REPLACE FUNCTION find_department_id(IN department_name VARCHAR(255), OUT d_id INTEGER)
+-- RETURNS INTEGER AS $$
+-- BEGIN
+-- 	select did into d_id 
+-- 	from Departments 
+-- 	where dname = department_name;
 
-END;
-$$ LANGUAGE plpgsql;
+-- END;
+-- $$ LANGUAGE plpgsql;
 
 /*---------------------------------------------------------*/
 
@@ -376,14 +376,14 @@ BEGIN
                 UPDATE Sessions
                 SET approval_status = decision
                 WHERE sdate = mdate
-                AND stime = mshour
+                AND stime = temp
                 AND sroom = mroom
                 AND sfloor = mfloor;
                 temp := temp + interval '1 hour';
             END LOOP;
         
         ELSE 
-            RAISE NOTICE 'approver does not have approval rights for this room';
+            RAISE NOTICE 'employee does not have approval rights for this room';
 
         END IF;
 
@@ -393,20 +393,6 @@ BEGIN
     END IF;
 END;
 $$ LANGUAGE plpgsql;
-
--- CREATE OR REPLACE FUNCTION delete_meeting() 
--- RETURNS TRIGGER AS $$
--- BEGIN
---     DELETE FROM Sessions
---     WHERE approval_status = 'rejected';
--- 	RETURN NEW;
--- END;
--- $$ LANGUAGE plpgsql;
-
--- CREATE TRIGGER reject_meeting
--- AFTER INSERT OR UPDATE ON Sessions
--- --FOR EACH ROW WHEN (NEW.approval_status = 'rejected')
--- EXECUTE PROCEDURE delete_meeting();
 
 CREATE OR REPLACE FUNCTION delete_meeting() 
 RETURNS TRIGGER AS $$
@@ -420,7 +406,7 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER reject_meeting
 AFTER INSERT OR UPDATE ON Sessions
 EXECUTE PROCEDURE delete_meeting();
--- trigger is not compiling
+
 -- employee must be a manager from the same department 
 /*---------------------------------------------------------*/
 
@@ -581,6 +567,9 @@ AFTER DELETE ON Joins
 FOR EACH ROW EXECUTE FUNCTION detect_booker();
 
 /*---------------------------------------------------------*/
+/*---------------------------------------------------------*/
+/* ADMIN */
+/*---------------------------------------------------------*/
 
 CREATE OR REPLACE FUNCTION non_compliance 
 (IN StartDate DATE, IN EndDate DATE)
@@ -606,7 +595,148 @@ RETURNS TABLE(Floor_number INTEGER, Room_number INTEGER, Date DATE, Start_hour T
 	ORDER BY sdate ASC, stime ASC;
 $$ language sql;
 
-/*--------------------------------------------------*/
+/*---------------------------------------------------------*/
+
+CREATE OR REPLACE FUNCTION view_future_meeting
+(IN startDate DATE, IN EmployeeID INTEGER)
+RETURNS TABLE(Floor_number INTEGER, Room_number INTEGER, Date DATE, Start_hour TIME) AS $$
+
+	SELECT sfloor, sroom, sdate, stime
+	FROM Sessions NATURAL JOIN Joins
+	WHERE approval_status = 'approved'
+	AND eid = EmployeeID
+	AND sdate >= startDate
+	ORDER BY sdate ASC, stime ASC;
+$$ LANGUAGE sql;
+
+
+
+
+--search_room
+
+CREATE OR REPLACE FUNCTION search_room (Date DATE, Start_hour TIME, End_hour TIME) 
+RETURNS TABLE(Floor_number INT, Room_number INT, Department_ID INT, Capacity INT) 
+AS $$
+
+	SELECT mr.Floor AS Floor_number, mr.Room AS room_number, mr.did AS Department_ID, u.capacity AS Capacity
+	FROM MeetingRooms mr, Updates u
+	WHERE NOT EXISTS (SELECT sdate, stime
+					FROM Sessions s
+					WHERE Date = sdate
+					AND stime BETWEEN Start_hour AND End_hour
+					AND s.sfloor = mr.floor
+					AND s.sroom = mr.room)
+	AND u.floor = mr.floor
+	AND u.room = mr.room
+	ORDER BY u.capacity ASC;
+	
+$$ LANGUAGE sql;
+
+/*---------------------------------------------------------*/
+
+--book_room
+
+CREATE OR REPLACE PROCEDURE book_room(floor_number INT, room_number INT, brdate DATE, Start_hour TIME,
+									End_hour TIME, EmployeeID INT)
+AS $$
+DECLARE 
+	curr_start_time TIME := Start_hour;
+	temp INT:= 0;
+BEGIN
+/* exception case: booking timing exceeds one-hour duration */
+	/* IF TIMEDIFF(CAST(Start_hour AS time),CAST(End_hour AS time)) > 1
+	THEN RAISE EXCEPTION 'The input timings exceed one hour. Bookings can only be made in one hour intervals';
+	END IF;  */
+
+/* exception case: employee is a junior */
+	IF NOT EXISTS(SELECT 1 from employees
+				WHERE eid = EmployeeID
+				AND (etype = 'Manager'
+				OR etype = 'Senior')) 
+				THEN RAISE EXCEPTION 'Current Employee does not have sufficient rights to book a room';
+	END IF;
+/* exception case: meeting room is already booked during stipulated timing*/
+	IF EXISTS(SELECT 1 from Sessions s
+			WHERE brdate = s.sdate
+			AND s.sfloor = floor_number
+			AND s.sroom = room_number
+			AND s.stime BETWEEN Start_hour AND End_hour)
+			THEN RAISE EXCEPTION 'Room has already been booked during that period. Please try another room or timing';
+	END IF;
+/* exception case: booker has already booked another room during stipulated timing*/
+	IF EXISTS(SELECT 1 from Sessions s
+			WHERE brdate = s.sdate
+			AND s.bookerid = EmployeeID
+			AND s.stime BETWEEN Start_hour AND End_hour)
+			THEN RAISE EXCEPTION 'Booker has already made a booking for another room during that period. Please try another timing';
+	END IF;
+	 
+	WHILE curr_start_time < End_hour LOOP
+		INSERT INTO Sessions VALUES (brdate, curr_start_time, floor_number, room_number, EmployeeID, temp);
+		curr_start_time := curr_start_time + interval '1 hour';
+	END LOOP;
+
+	CALL join_meeting(floor_number, room_number, brdate, Start_hour, End_hour, EmployeeID);
+
+END;
+$$ Language plpgsql;
+
+/*---------------------------------------------------------*/
+
+--unbook_room
+
+CREATE OR REPLACE PROCEDURE unbook_room(floor_number INT, room_number INT, brdate DATE, Start_hour TIME, End_hour TIME, EmployeeID INT)
+AS $$
+/* DECLARE 
+	curs CURSOR FOR (SELECT * FROM Joins
+					WHERE sdate = brdate
+					AND stime = Start_hour
+					AND sfloor = floor_number
+					AND sroom = room_number) ;
+	r RECORD; */
+DECLARE
+	curr_start_time TIME := Start_hour;
+BEGIN
+	/*check if booking exists*/
+	WHILE curr_start_time < End_hour LOOP
+		IF NOT EXISTS (SELECT 1 FROM Sessions
+				WHERE sdate = brdate
+				AND stime = curr_start_time
+				AND sfloor = floor_number
+				AND sroom = room_number)
+				THEN RAISE EXCEPTION 'There is no such session available.';
+		END IF;
+	/*Check if employee is the og booker*/
+		IF EmployeeID <> (SELECT bookerid
+						FROM Sessions 
+						WHERE sdate = brdate
+						AND stime = curr_start_time
+						AND sfloor = floor_number
+						AND sroom = room_number)
+					THEN RAISE EXCEPTION 'Current employee did not make this booking. Please contact orginal booker.';
+		END IF;
+		curr_start_time := curr_start_time + interval '1 hour';
+	END LOOP;
+	/*check if meeting is approved -> remove approval*/
+	/*loop through all participants to remove them*/
+	curr_start_time := Start_hour;
+	WHILE curr_start_time < End_hour LOOP
+		DELETE FROM Joins 
+		WHERE	sdate = brdate
+				AND stime = curr_start_time
+				AND sfloor = floor_number
+				AND sroom = room_number ;
+		/*finally delete session record*/
+		DELETE FROM Sessions
+		WHERE 	sdate = brdate
+				AND stime = curr_start_time
+				AND sfloor = floor_number
+				AND sroom = room_number	;
+		curr_start_time := curr_start_time + interval '1 hour';
+	END LOOP;
+
+END;
+$$ Language plpgsql;
 
 CREATE OR REPLACE FUNCTION view_manager_report (startDate DATE, EmployeeID INT)
 RETURNS TABLE(floor_number INT, room_number INT, booking_date DATE, Start_hour TIME, BookerID INT)
