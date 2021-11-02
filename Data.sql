@@ -62,8 +62,31 @@ INSERT INTO Sessions VALUES ('2022-04-18', '08:00:00' , 2 , 22 , 2, 1, NULL); --
 INSERT INTO Sessions VALUES ('2022-04-10', '09:00:00' , 2 , 23 , 3, 1, NULL); -- HR private room
 INSERT INTO Sessions VALUES ('2022-05-10', '09:00:00' , 2 , 25 , 3, 1, 'approved'); -- Videoconferencing Room
 INSERT INTO Sessions VALUES ('2022-05-10', '09:00:00' , 4 , 17 , 2, 1, NULL);
+INSERT INTO Sessions VALUES ('2022-05-10', '10:00:00' , 2 , 25 , 3, 1, 'approved');
+INSERT INTO Sessions VALUES ('2022-04-10', '12:00:00' , 2 , 23 , 3, 1, 'approved');
+
+-- long sessions
+INSERT INTO Sessions VALUES ('2022-10-29', '09:00:00' , 3 , 11 , 3, 1, NULL); -- HR Room
+INSERT INTO Sessions VALUES ('2022-10-29', '10:00:00' , 3 , 11 , 3, 1, NULL);
+INSERT INTO Sessions VALUES ('2022-10-29', '11:00:00' , 3 , 11 , 3, 1, NULL);
+
+INSERT INTO Sessions VALUES ('2022-10-31', '11:00:00' , 3 , 32 , 3, 1, NULL); -- Marketing room
+INSERT INTO Sessions VALUES ('2022-10-31', '12:00:00' , 3 , 32 , 3, 1, NULL);
+INSERT INTO Sessions VALUES ('2022-10-31', '13:00:00' , 3 , 32 , 3, 1, NULL);
+
 
 INSERT INTO Joins VALUES(2,'2022-04-18', '08:00:00', 2, 22); -- to simulate initial booking of HR conferencing room
 INSERT INTO Joins VALUES(3,'2022-04-10', '09:00:00', 2, 23); -- to simulate initial booking of HR private room
 INSERT INTO Joins VALUES(3,'2022-05-10', '09:00:00', 2, 25); -- to simulate initial booking of Videoconferencing Room
 INSERT INTO Joins VALUES(2,'2022-05-10', '09:00:00', 4, 17);
+INSERT INTO Joins VALUES(3,'2022-05-10', '10:00:00', 2, 25);
+INSERT INTO Joins VALUES(3,'2022-04-10', '12:00:00', 2, 23);
+
+-- join long sessions
+INSERT INTO Joins VALUES(3,'2022-10-29', '09:00:00', 3, 11);
+INSERT INTO Joins VALUES(3,'2022-10-29', '10:00:00', 3, 11);
+INSERT INTO Joins VALUES(3,'2022-10-29', '11:00:00', 3, 11);
+
+INSERT INTO Joins VALUES(3,'2022-10-31', '11:00:00', 3, 32);
+INSERT INTO Joins VALUES(3,'2022-10-31', '12:00:00', 3, 32);
+INSERT INTO Joins VALUES(3,'2022-10-31', '13:00:00', 3, 32);
