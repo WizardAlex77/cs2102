@@ -29,6 +29,7 @@ CALL add_employee('Gareth Koh', 'Junior', 1, 99998880, null, null); --expected t
 /* Function (6) remove_employee */
 CALL remove_employee(18, '2021-11-2'); --expected to pass
 CALL remove_employee(99, '2021-11-2'); --expected to fail, employee does not exist
+
 /* Set 1: Verify that the function works in the normal case (Passing) */
 CALL add_employee ('Grace', '98765432', 'Junior', 'Accounting')
 CALL add_employee ('Natalie', '12345678', 'Manager', 'HR')
