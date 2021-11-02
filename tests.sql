@@ -1,6 +1,7 @@
 /* Function (1) add_employee (Fabian) */
 
-/* Set 1: Verify that the function works in the normal case (Passing) */
+/* THIS IS A PLACEHOLDER 
+Set 1: Verify that the function works in the normal case (Passing) 
 CALL add_employee ('Grace', '98765432', 'Junior', 'Accounting')
 CALL add_employee ('Natalie', '12345678', 'Manager', 'HR')
 CALL add_employee ('Gareth', '99998888', 'Senior', 'Accounting')
@@ -122,3 +123,23 @@ CALL approve_meeting(2, 23,'2022-04-10', '09:00:00', '10:00:00', 2, 'rejected');
 CALL declarehealth(4, '2021-10-16', 36.5); --expected to pass - correct
 CALL declarehealth(5, '2021-10-16', 36.5); --expected to fail - correct
 
+/* Function search_room */
+
+SELECT search_room('2022-05-10', '09:00', '15:00'); --should return 12 rooms
+SELECT search_room('2022-05-13', '09:00', '15:00'); --should return 14 rooms
+
+CALL book_room(1, 11, '2022-05-10', '09:00', '10:00', 2); --expect to fail -- has booked another room during same timing
+CALL book_room(2, 22, '2022-04-10', '08:00', '12:00', 2); -- expect to pass
+CALL book_room(2, 22, '2022-04-12', '08:00', '12:00', 3); -- expect to pass
+CALL book_room(2, 22, '2022-04-13', '08:00', '12:00', 1); -- expect to fail -- employee access error
+
+
+CALL unbook_room(1, 11, '2022-05-10', '09:00', '10:00', 2); -- expect to fail - no such session avail
+CALL unbook_room(2, 22, '2022-04-12', '08:00', '12:00', 2); -- expect to fail - not original booker
+CALL unbook_room(2, 22, '2022-04-12', '08:00', '12:00', 3); -- expect to pass
+CALL unbook_room(2, 22, '2022-04-10', '08:00', '12:00', 2); -- expect to pass 
+
+SELECT view_manager_report('2022-04-10', 2); -- pass;should have 2 reports
+SELECT view_manager_report('2022-04-11', 2); -- pass;should have 2 reports
+SELECT view_manager_report('2022-05-10', 2); -- pass;should have 1 report
+SELECT view_manager_report('2022-05-10', 3); -- fail;should throw employee error
