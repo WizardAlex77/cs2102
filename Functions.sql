@@ -650,4 +650,58 @@ BEGIN
 		ORDER BY s.sdate,s.stime ASC; 
 	
 END;
+<<<<<<< Updated upstream
 $$ Language plpgsql;
+=======
+$$ Language plpgsql;
+
+/*--------------------------------------------------*/
+
+CREATE OR REPLACE PROCEDURE on_session_join
+(IN jdate DATE, IN jtime TIME, IN jfloor INTEGER, IN jroom INTEGER)
+AS $$
+BEGIN
+	UPDATE Sessions 
+	SET participants = participants + 1
+	WHERE sdate = jdate
+	AND stime = jtime
+	AND sfloor = jfloor
+	AND sroom = jroom;
+END;
+$$ language plpgsql;
+
+CREATE OR REPLACE PROCEDURE on_session_leave
+(IN jdate DATE, IN jtime TIME, IN jfloor INTEGER, IN jroom INTEGER)
+AS $$
+BEGIN
+	UPDATE Sessions 
+	SET participants = participants - 1
+	WHERE sdate = jdate
+	AND stime = jtime
+	AND sfloor = jfloor
+	AND sroom = jroom;
+END;
+$$ language plpgsql;
+
+CREATE OR REPLACE FUNCTION on_session_join_triggerfunc() RETURNS TRIGGER AS $$
+BEGIN 
+	CALL on_session_join(NEW.sdate, NEW.stime, NEW.sfloor, NEW.sroom);
+	RETURN NULL;
+END;
+$$ language plpgsql;
+
+CREATE TRIGGER participant_increment
+AFTER INSERT ON Joins
+FOR EACH ROW EXECUTE FUNCTION on_session_join_triggerfunc();
+
+CREATE OR REPLACE FUNCTION on_session_leave_triggerfunc() RETURNS TRIGGER AS $$
+BEGIN 
+	CALL on_session_leave(OLD.sdate, OLD.stime, OLD.sfloor, OLD.sroom);
+	RETURN NULL;
+END;
+$$ language plpgsql;
+
+CREATE TRIGGER participant_decrement
+AFTER DELETE ON Joins
+FOR EACH ROW EXECUTE FUNCTION on_session_leave_triggerfunc();
+>>>>>>> Stashed changes
