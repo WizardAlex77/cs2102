@@ -314,13 +314,6 @@ BEGIN
                 INSERT INTO Joins
                 VALUES (emp, mdate, temp, mfloor, mroom);
                 
-                UPDATE Sessions 
-                SET participants = participants + 1 
-                WHERE sdate = mdate 
-                AND stime = temp 
-                AND sroom = mroom 
-                AND sfloor = mfloor;
-                
                 temp := temp + interval '1 hour';
             END LOOP;
         ELSE
@@ -357,14 +350,6 @@ BEGIN
             AND stime = temp
             AND sfloor = mfloor
             AND sroom  = mroom;
-           
-
-            UPDATE Sessions
-            SET participants = participants - 1
-            WHERE sdate = mdate
-            AND stime = temp
-            AND sroom = mroom
-            AND sfloor = mfloor;
 
             temp := temp + interval '1 hour';
         END LOOP;
@@ -449,7 +434,7 @@ EXECUTE PROCEDURE delete_meeting();
 /*---------------------------------------------------------*/
 --declare_health
 
-CREATE OR REPLACE PROCEDURE DeclareHealth
+CREATE OR REPLACE PROCEDURE declare_health
 (IN EmployeeID INTEGER, IN Date DATE, IN Temperature NUMERIC(3,1))
 AS $$
 BEGIN
@@ -651,3 +636,54 @@ BEGIN
 	
 END;
 $$ Language plpgsql;
+
+/*--------------------------------------------------*/
+
+CREATE OR REPLACE PROCEDURE on_session_join
+(IN jdate DATE, IN jtime TIME, IN jfloor INTEGER, IN jroom INTEGER)
+AS $$
+BEGIN
+	UPDATE Sessions 
+	SET participants = participants + 1
+	WHERE sdate = jdate
+	AND stime = jtime
+	AND sfloor = jfloor
+	AND sroom = jroom;
+END;
+$$ language plpgsql;
+
+CREATE OR REPLACE PROCEDURE on_session_leave
+(IN jdate DATE, IN jtime TIME, IN jfloor INTEGER, IN jroom INTEGER)
+AS $$
+BEGIN
+	UPDATE Sessions 
+	SET participants = participants - 1
+	WHERE sdate = jdate
+	AND stime = jtime
+	AND sfloor = jfloor
+	AND sroom = jroom;
+END;
+$$ language plpgsql;
+
+CREATE OR REPLACE FUNCTION on_session_join_triggerfunc() RETURNS TRIGGER AS $$
+BEGIN 
+	CALL on_session_join(NEW.sdate, NEW.stime, NEW.sfloor, NEW.sroom);
+	RETURN NULL;
+END;
+$$ language plpgsql;
+
+CREATE TRIGGER participant_increment
+AFTER INSERT ON Joins
+FOR EACH ROW EXECUTE FUNCTION on_session_join_triggerfunc();
+
+CREATE OR REPLACE FUNCTION on_session_leave_triggerfunc() RETURNS TRIGGER AS $$
+BEGIN 
+	CALL on_session_leave(OLD.sdate, OLD.stime, OLD.sfloor, OLD.sroom);
+	RAISE NOTICE 'called';
+	RETURN NULL;
+END;
+$$ language plpgsql;
+
+CREATE TRIGGER participant_decrement
+AFTER DELETE ON Joins
+FOR EACH ROW EXECUTE FUNCTION on_session_leave_triggerfunc();
