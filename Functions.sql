@@ -314,13 +314,6 @@ BEGIN
                 INSERT INTO Joins
                 VALUES (emp, mdate, temp, mfloor, mroom);
                 
-                UPDATE Sessions 
-                SET participants = participants + 1 
-                WHERE sdate = mdate 
-                AND stime = temp 
-                AND sroom = mroom 
-                AND sfloor = mfloor;
-                
                 temp := temp + interval '1 hour';
             END LOOP;
         ELSE
@@ -357,14 +350,6 @@ BEGIN
             AND stime = temp
             AND sfloor = mfloor
             AND sroom  = mroom;
-           
-
-            UPDATE Sessions
-            SET participants = participants - 1
-            WHERE sdate = mdate
-            AND stime = temp
-            AND sroom = mroom
-            AND sfloor = mfloor;
 
             temp := temp + interval '1 hour';
         END LOOP;
@@ -449,7 +434,7 @@ EXECUTE PROCEDURE delete_meeting();
 /*---------------------------------------------------------*/
 --declare_health
 
-CREATE OR REPLACE PROCEDURE DeclareHealth
+CREATE OR REPLACE PROCEDURE declare_health
 (IN EmployeeID INTEGER, IN Date DATE, IN Temperature NUMERIC(3,1))
 AS $$
 BEGIN
@@ -652,8 +637,6 @@ BEGIN
 END;
 <<<<<<< Updated upstream
 $$ Language plpgsql;
-=======
-$$ Language plpgsql;
 
 /*--------------------------------------------------*/
 
@@ -704,4 +687,3 @@ $$ language plpgsql;
 CREATE TRIGGER participant_decrement
 AFTER DELETE ON Joins
 FOR EACH ROW EXECUTE FUNCTION on_session_leave_triggerfunc();
->>>>>>> Stashed changes
