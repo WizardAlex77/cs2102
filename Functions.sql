@@ -293,6 +293,8 @@ BEGIN
 END;
 $$ Language plpgsql;
 
+/*---------------------------------------------------------*/
+
 -- join_meeting
 
 CREATE OR REPLACE PROCEDURE join_meeting
@@ -306,9 +308,7 @@ BEGIN
     IF ((EXISTS(SELECT 1 FROM Sessions WHERE sdate = mdate AND stime = mshour AND sroom = mroom AND sfloor = mfloor AND approval_status IS NULL)) 
     AND (NOT EXISTS(SELECT 1 FROM Joins WHERE eid = emp AND sdate = mdate AND stime = mshour AND sroom = mroom AND sfloor = mfloor))) THEN
 
-        --SELECT u.capacity INTO cap FROM Updates u WHERE room = mroom AND floor = mfloor ORDER BY udate DESC LIMIT 1;
-        --SELECT rcapacity INTO cap FROM MeetingRooms WHERE room = mroom AND floor = mfloor;
-		SELECT u.capacity INTO cap FROM Updates u WHERE u.udate = (SELECT MAX(udate) FROM Updates WHERE room = mroom AND floor = mfloor) AND room = mroom AND floor = mfloor;
+		SELECT u.capacity INTO cap FROM Updates u WHERE u.udate = (SELECT MAX(udate) FROM Updates WHERE room = mroom AND floor = mfloor AND udate <= mdate) AND room = mroom AND floor = mfloor;
         IF ((SELECT s.participants FROM Sessions s WHERE sdate = mdate AND stime = mshour AND sroom = mroom AND sfloor = mfloor) < cap) THEN
             WHILE temp < mehour LOOP
                 INSERT INTO Joins
@@ -380,7 +380,7 @@ BEGIN
                 UPDATE Sessions
                 SET approval_status = decision
                 WHERE sdate = mdate
-                AND stime = mshour
+                AND stime = temp
                 AND sroom = mroom
                 AND sfloor = mfloor;
                 temp := temp + interval '1 hour';
@@ -398,20 +398,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- CREATE OR REPLACE FUNCTION delete_meeting() 
--- RETURNS TRIGGER AS $$
--- BEGIN
---     DELETE FROM Sessions
---     WHERE approval_status = 'rejected';
--- 	RETURN NEW;
--- END;
--- $$ LANGUAGE plpgsql;
-
--- CREATE TRIGGER reject_meeting
--- AFTER INSERT OR UPDATE ON Sessions
--- --FOR EACH ROW WHEN (NEW.approval_status = 'rejected')
--- EXECUTE PROCEDURE delete_meeting();
-
 CREATE OR REPLACE FUNCTION delete_meeting() 
 RETURNS TRIGGER AS $$
 BEGIN
@@ -424,7 +410,7 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER reject_meeting
 AFTER INSERT OR UPDATE ON Sessions
 EXECUTE PROCEDURE delete_meeting();
--- trigger is not compiling
+
 -- employee must be a manager from the same department 
 /*---------------------------------------------------------*/
 
@@ -585,6 +571,9 @@ AFTER DELETE ON Joins
 FOR EACH ROW EXECUTE FUNCTION detect_booker();
 
 /*---------------------------------------------------------*/
+/*---------------------------------------------------------*/
+/* ADMIN */
+/*---------------------------------------------------------*/
 
 CREATE OR REPLACE FUNCTION non_compliance 
 (IN StartDate DATE, IN EndDate DATE)
@@ -609,6 +598,20 @@ RETURNS TABLE(Floor_number INTEGER, Room_number INTEGER, Date DATE, Start_hour T
 	AND sdate >= StartDate
 	ORDER BY sdate ASC, stime ASC;
 $$ language sql;
+
+/*--------------------------------------------------*/
+
+CREATE OR REPLACE FUNCTION view_future_meeting
+(IN startDate DATE, IN EmployeeID INTEGER)
+RETURNS TABLE(Floor_number INTEGER, Room_number INTEGER, Date DATE, Start_hour TIME) AS $$
+
+	SELECT sfloor, sroom, sdate, stime
+	FROM Sessions NATURAL JOIN Joins
+	WHERE approval_status = 'approved'
+	AND eid = EmployeeID
+	AND sdate >= startDate
+	ORDER BY sdate ASC, stime ASC;
+$$ LANGUAGE sql;
 
 /*--------------------------------------------------*/
 
