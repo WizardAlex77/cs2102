@@ -13,13 +13,13 @@ INSERT INTO Employees (ename, email, etype, did, mp_num) VALUES ('Francis Tan We
 INSERT INTO Employees (ename, email, etype, did, mp_num, hp_num) VALUES ('Lucas Hwang', 'lucashwang_7@company.com', 'Junior', 7, 92119942, 64564567);
 
 --SENIOR EMPLOYEES
-INSERT INTO Employees (ename, email, etype, did, mp_num, op_num) VALUES ('Gareth Koh', 'garethkoh_8@company.com','Senior', 1, 99998888, 67771111);
+INSERT INTO Employees (ename, email, etype, did, mp_num, op_num) VALUES ('Gareth Koh', 'garethkoh_8@company.com','Senior', 1, 99998888, 67771111);  --8
 INSERT INTO Employees (ename, email, etype, did, mp_num, hp_num) VALUES ('Daphne Chua', 'daphnechua_9@company.com','Senior', 2, 90001421, 60293333);
 INSERT INTO Employees (ename, email, etype, did, mp_num) VALUES ('Kailash Grewal', 'kailashgrewal_10@company.com', 'Senior', 3, 92045667);
 INSERT INTO Employees (ename, email, etype, did, mp_num, hp_num) VALUES ('Rajab bin Razeen', 'rajabbinrazeen_11@company.com', 'Senior', 4, 89204819, 61123345);
 
 -- MANAGER EMPLOYEES
-INSERT INTO Employees (ename, email, etype, did, mp_num, op_num, hp_num) VALUES ('Natalie Gordon', 'nataliegordon_12@company.com', 'Manager', 1, 92345678, 67771111, 60992221);
+INSERT INTO Employees (ename, email, etype, did, mp_num, op_num, hp_num) VALUES ('Natalie Gordon', 'nataliegordon_12@company.com', 'Manager', 1, 92345678, 67771111, 60992221); --12
 INSERT INTO Employees (ename, email, etype, did, mp_num, op_num) VALUES ('Esther Bell', 'estherbell_13@company.com', 'Manager', 2, 87653456, 65553922);
 INSERT INTO Employees (ename, email, etype, did, mp_num, op_num, hp_num) VALUES ('Chan Yu Xin', 'chanyuxin_14@company.com', 'Manager', 3, 96745221, 63312254, 61123009);
 INSERT INTO Employees (ename, email, etype, did, mp_num, op_num) VALUES ('Diti Sankar', 'ditisankar_15@company.com', 'Manager', 4, 91914081, 60090002);
@@ -100,40 +100,54 @@ insert into Updates values ('2021-11-1', 2, 39, 4); --#02-39, department 5
 insert into Updates values ('2021-11-1', 4, 15, 2); --#-4-15, department 8
 
 /*---------------------------------------------------------*/
-
-
-INSERT INTO Sessions VALUES ('2022-04-18', '08:00:00' , 2 , 22 , 2, 1, NULL); -- HR conferencing room
-INSERT INTO Sessions VALUES ('2022-04-10', '09:00:00' , 2 , 23 , 3, 1, NULL); -- HR private room
-INSERT INTO Sessions VALUES ('2022-05-10', '09:00:00' , 2 , 25 , 3, 1, 'approved'); -- Videoconferencing Room
-INSERT INTO Sessions VALUES ('2022-05-10', '09:00:00' , 4 , 17 , 2, 1, NULL);
-INSERT INTO Sessions VALUES ('2022-05-10', '10:00:00' , 2 , 25 , 3, 1, 'approved');
-INSERT INTO Sessions VALUES ('2022-04-10', '12:00:00' , 2 , 23 , 3, 1, 'approved');
-
+/* for testing _meeting functions */
+INSERT INTO Sessions VALUES ('2022-04-10', '09:00:00' , 2 , 21 , 8, 1, NULL); -- HR private room
+INSERT INTO Sessions VALUES ('2022-04-10', '12:00:00' , 2 , 21 , 8, 1, 'approved');
+INSERT INTO Sessions VALUES ('2022-04-18', '08:00:00' , 2 , 34 , 13, 1, NULL); -- HR conferencing room
+INSERT INTO Sessions VALUES ('2022-05-10', '09:00:00' , 4 , 11 , 13, 1, NULL);
+INSERT INTO Sessions VALUES ('2022-05-10', '09:00:00' , 2 , 23 , 8, 1, 'approved'); -- Videoconferencing Room
+INSERT INTO Sessions VALUES ('2022-05-10', '10:00:00' , 2 , 23 , 8, 1, 'approved');
 -- long sessions
-INSERT INTO Sessions VALUES ('2022-10-29', '09:00:00' , 3 , 11 , 3, 1, NULL); -- HR Room
-INSERT INTO Sessions VALUES ('2022-10-29', '10:00:00' , 3 , 11 , 3, 1, NULL);
-INSERT INTO Sessions VALUES ('2022-10-29', '11:00:00' , 3 , 11 , 3, 1, NULL);
+INSERT INTO Sessions VALUES ('2022-10-29', '09:00:00' , 3 , 11 , 8, 1, NULL); -- HR Room
+INSERT INTO Sessions VALUES ('2022-10-29', '10:00:00' , 3 , 11 , 8, 1, NULL);
+INSERT INTO Sessions VALUES ('2022-10-29', '11:00:00' , 3 , 11 , 8, 1, NULL);
 
-INSERT INTO Sessions VALUES ('2022-10-31', '11:00:00' , 3 , 32 , 3, 1, NULL); -- Marketing room
-INSERT INTO Sessions VALUES ('2022-10-31', '12:00:00' , 3 , 32 , 3, 1, NULL);
-INSERT INTO Sessions VALUES ('2022-10-31', '13:00:00' , 3 , 32 , 3, 1, NULL);
+INSERT INTO Sessions VALUES ('2022-10-31', '11:00:00' , 3 , 32 , 8, 1, NULL); -- Marketing room
+INSERT INTO Sessions VALUES ('2022-10-31', '12:00:00' , 3 , 32 , 8, 1, NULL);
+INSERT INTO Sessions VALUES ('2022-10-31', '13:00:00' , 3 , 32 , 8, 1, NULL);
 
+-- simulate initial booking of sessions
+INSERT INTO Joins VALUES(8,'2022-04-10', '09:00:00', 2, 21); -- to simulate initial booking of HR private room
+INSERT INTO Joins VALUES(8,'2022-04-10', '12:00:00', 2, 21);
+INSERT INTO Joins VALUES(13,'2022-04-18', '08:00:00', 2, 34); -- to simulate initial booking of HR conferencing room
+INSERT INTO Joins VALUES(13,'2022-05-10', '09:00:00', 4, 11);
+INSERT INTO Joins VALUES(8,'2022-05-10', '09:00:00', 2, 23); -- to simulate initial booking of Videoconferencing Room
+INSERT INTO Joins VALUES(8,'2022-05-10', '10:00:00', 2, 23);
 
-INSERT INTO Joins VALUES(2,'2022-04-18', '08:00:00', 2, 22); -- to simulate initial booking of HR conferencing room
-INSERT INTO Joins VALUES(3,'2022-04-10', '09:00:00', 2, 23); -- to simulate initial booking of HR private room
-INSERT INTO Joins VALUES(3,'2022-05-10', '09:00:00', 2, 25); -- to simulate initial booking of Videoconferencing Room
-INSERT INTO Joins VALUES(2,'2022-05-10', '09:00:00', 4, 17);
-INSERT INTO Joins VALUES(3,'2022-05-10', '10:00:00', 2, 25);
-INSERT INTO Joins VALUES(3,'2022-04-10', '12:00:00', 2, 23);
+-- simulate initial booking of long sessions
+INSERT INTO Joins VALUES(8,'2022-10-29', '09:00:00', 3, 11);
+INSERT INTO Joins VALUES(8,'2022-10-29', '10:00:00', 3, 11);
+INSERT INTO Joins VALUES(8,'2022-10-29', '11:00:00', 3, 11);
 
--- join long sessions
-INSERT INTO Joins VALUES(3,'2022-10-29', '09:00:00', 3, 11);
-INSERT INTO Joins VALUES(3,'2022-10-29', '10:00:00', 3, 11);
-INSERT INTO Joins VALUES(3,'2022-10-29', '11:00:00', 3, 11);
+INSERT INTO Joins VALUES(8,'2022-10-31', '11:00:00', 3, 32);
+INSERT INTO Joins VALUES(8,'2022-10-31', '12:00:00', 3, 32);
+INSERT INTO Joins VALUES(8,'2022-10-31', '13:00:00', 3, 32);
 
-INSERT INTO Joins VALUES(3,'2022-10-31', '11:00:00', 3, 32);
-INSERT INTO Joins VALUES(3,'2022-10-31', '12:00:00', 3, 32);
-INSERT INTO Joins VALUES(3,'2022-10-31', '13:00:00', 3, 32);
+/* for testing contact tracing */
+INSERT INTO Sessions VALUES ('2021-11-10', '10:00:00' , 5 , 03 , 9, 1, NULL);
+INSERT INTO Sessions VALUES ('2021-11-11', '10:00:00' , 5 , 03 , 14, 1, NULL);
+
+INSERT INTO Joins VALUES(9,'2021-11-10', '10:00:00' , 5 , 03);
+INSERT INTO Joins VALUES(14,'2021-11-11', '10:00:00' , 5 , 03);
+
+/* for testing updates to room capacity */
+INSERT INTO Sessions VALUES ('2021-10-10', '10:00:00' , 4 , 15 , 10, 1, NULL);
+INSERT INTO Sessions VALUES ('2021-11-11', '10:00:00' , 2 , 39 , 11, 1, NULL);
+
+INSERT INTO Joins VALUES(10,'2021-10-10', '10:00:00' , 4 , 15);
+INSERT INTO Joins VALUES(11,'2021-11-11', '10:00:00' , 2 , 39);
+
+/*---------------------------------------------------------*/
 
 --Healthdeclarations
 INSERT INTO HealthDeclarations VALUES('2021-10-31', 1, 37.6, true); --employee 1 with fever
