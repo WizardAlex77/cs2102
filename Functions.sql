@@ -183,6 +183,8 @@ AS $$
 					AND s.sroom = mr.room)
 	AND u.floor = mr.floor
 	AND u.room = mr.room
+	AND MAX(u.udate)
+	AND sdate > u.date
 	ORDER BY u.capacity ASC;
 	
 $$ LANGUAGE sql;
@@ -242,13 +244,6 @@ $$ Language plpgsql;
 
 CREATE OR REPLACE PROCEDURE unbook_room(floor_number INT, room_number INT, brdate DATE, Start_hour TIME, End_hour TIME, EmployeeID INT)
 AS $$
-/* DECLARE 
-	curs CURSOR FOR (SELECT * FROM Joins
-					WHERE sdate = brdate
-					AND stime = Start_hour
-					AND sfloor = floor_number
-					AND sroom = room_number) ;
-	r RECORD; */
 DECLARE
 	curr_start_time TIME := Start_hour;
 BEGIN
