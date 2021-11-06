@@ -136,40 +136,40 @@ INSERT INTO Joins VALUES(3,'2022-10-31', '12:00:00', 3, 32);
 INSERT INTO Joins VALUES(3,'2022-10-31', '13:00:00', 3, 32);
 
 --Healthdeclarations
-INSERT INTO HealthDeclarations VALUES('2021-10-31', 1, 37.6); --employee 1 with fever
-INSERT INTO HealthDeclarations VALUES('2021-10-31', 2, 35.5);
-INSERT INTO HealthDeclarations VALUES('2021-10-31', 4, 36.4);
-INSERT INTO HealthDeclarations VALUES('2021-10-31', 6, 36.9);
-INSERT INTO HealthDeclarations VALUES('2021-10-31', 15, 35.6);
-INSERT INTO HealthDeclarations VALUES('2021-10-31', 12, 35.7);
-INSERT INTO HealthDeclarations VALUES('2021-11-01', 1, 38.5); --employee 1 with fever
-INSERT INTO HealthDeclarations VALUES('2021-11-01', 15, 35.4);
-INSERT INTO HealthDeclarations VALUES('2021-11-01', 12, 35.9);
-INSERT INTO HealthDeclarations VALUES('2021-11-02', 1, 35.5); --employee 1 no longer has fever
-INSERT INTO HealthDeclarations VALUES('2021-11-02', 2, 35.4);
-INSERT INTO HealthDeclarations VALUES('2021-11-02', 4, 36.3);
-INSERT INTO HealthDeclarations VALUES('2021-11-02', 6, 36.1);
-INSERT INTO HealthDeclarations VALUES('2021-11-02', 15, 35.1);
-INSERT INTO HealthDeclarations VALUES('2021-11-02', 12, 35.3);
+INSERT INTO HealthDeclarations VALUES('2021-10-31', 1, 37.6, true); --employee 1 with fever
+INSERT INTO HealthDeclarations VALUES('2021-10-31', 2, 35.5, false);
+INSERT INTO HealthDeclarations VALUES('2021-10-31', 4, 36.4, false);
+INSERT INTO HealthDeclarations VALUES('2021-10-31', 6, 36.9, false);
+INSERT INTO HealthDeclarations VALUES('2021-10-31', 15, 35.6, false);
+INSERT INTO HealthDeclarations VALUES('2021-10-31', 12, 35.7, false);
+INSERT INTO HealthDeclarations VALUES('2021-11-01', 1, 38.5, true); --employee 1 with fever
+INSERT INTO HealthDeclarations VALUES('2021-11-01', 15, 35.4, false);
+INSERT INTO HealthDeclarations VALUES('2021-11-01', 12, 35.9, false);
+INSERT INTO HealthDeclarations VALUES('2021-11-02', 1, 35.5, false); --employee 1 no longer has fever
+INSERT INTO HealthDeclarations VALUES('2021-11-02', 2, 35.4, false);
+INSERT INTO HealthDeclarations VALUES('2021-11-02', 4, 36.3, false);
+INSERT INTO HealthDeclarations VALUES('2021-11-02', 6, 36.1, false);
+INSERT INTO HealthDeclarations VALUES('2021-11-02', 15, 35.1, false);
+INSERT INTO HealthDeclarations VALUES('2021-11-02', 12, 35.3, false);
 
 
-INSERT INTO HealthDeclarations VALUES('2022-10-31', 1, 36.5);
-INSERT INTO HealthDeclarations VALUES('2022-10-31', 2, 37.0);
-INSERT INTO HealthDeclarations VALUES('2022-10-31', 3, 36.0);
-INSERT INTO HealthDeclarations VALUES('2022-10-31', 4, 35.5);
-INSERT INTO HealthDeclarations VALUES('2022-10-31', 5, 36.3);
-INSERT INTO HealthDeclarations VALUES('2022-10-31', 6, 36.5);
-INSERT INTO HealthDeclarations VALUES('2022-10-31', 7, 37.0);
-INSERT INTO HealthDeclarations VALUES('2022-10-31', 8, 36.0);
-INSERT INTO HealthDeclarations VALUES('2022-10-31', 9, 35.5);
-INSERT INTO HealthDeclarations VALUES('2022-10-31', 10, 36.3);
-INSERT INTO HealthDeclarations VALUES('2022-10-31', 11, 36.5);
-INSERT INTO HealthDeclarations VALUES('2022-10-31', 12, 37.0);
-INSERT INTO HealthDeclarations VALUES('2022-10-31', 13, 36.0);
-INSERT INTO HealthDeclarations VALUES('2022-10-31', 14, 35.5);
-INSERT INTO HealthDeclarations VALUES('2022-10-31', 15, 36.3);
-INSERT INTO HealthDeclarations VALUES('2022-10-31', 16, 36.5);
-INSERT INTO HealthDeclarations VALUES('2022-10-31', 17, 37.0);
-INSERT INTO HealthDeclarations VALUES('2022-10-31', 18, 36.0);
-INSERT INTO HealthDeclarations VALUES('2022-10-31', 19, 35.5);
-INSERT INTO HealthDeclarations VALUES('2022-10-31', 20, 36.3);
+INSERT INTO HealthDeclarations VALUES('2022-10-31', 1, 36.5, false);
+INSERT INTO HealthDeclarations VALUES('2022-10-31', 2, 37.0, false);
+INSERT INTO HealthDeclarations VALUES('2022-10-31', 3, 36.0, false);
+INSERT INTO HealthDeclarations VALUES('2022-10-31', 4, 35.5, false);
+INSERT INTO HealthDeclarations VALUES('2022-10-31', 5, 36.3, false);
+INSERT INTO HealthDeclarations VALUES('2022-10-31', 6, 36.5, false);
+INSERT INTO HealthDeclarations VALUES('2022-10-31', 7, 37.0, false);
+INSERT INTO HealthDeclarations VALUES('2022-10-31', 8, 36.0, false);
+INSERT INTO HealthDeclarations VALUES('2022-10-31', 9, 35.5, false);
+INSERT INTO HealthDeclarations VALUES('2022-10-31', 10, 36.3, false);
+INSERT INTO HealthDeclarations VALUES('2022-10-31', 11, 36.5, false);
+INSERT INTO HealthDeclarations VALUES('2022-10-31', 12, 37.0, false);
+INSERT INTO HealthDeclarations VALUES('2022-10-31', 13, 36.0, false);
+INSERT INTO HealthDeclarations VALUES('2022-10-31', 14, 35.5, false);
+INSERT INTO HealthDeclarations VALUES('2022-10-31', 15, 36.3, false);
+INSERT INTO HealthDeclarations VALUES('2022-10-31', 16, 36.5, false);
+INSERT INTO HealthDeclarations VALUES('2022-10-31', 17, 37.0, false);
+INSERT INTO HealthDeclarations VALUES('2022-10-31', 18, 36.0, false);
+INSERT INTO HealthDeclarations VALUES('2022-10-31', 19, 35.5, false);
+INSERT INTO HealthDeclarations VALUES('2022-10-31', 20, 36.3, false);
