@@ -1,20 +1,20 @@
 /* Function (1) add_department */
-CALL add_department(5, 'Marketing'); --expected to pass
-CALL add_department(6, 'Operations'); --expected to pass
+CALL add_department(11, 'Finance'); --expected to pass
+CALL add_department(12, 'Agile Solutions'); --expected to pass
 CALL add_department(1, 'Accounting'); --expected to fail; department already exists
 
 /* Function (2) remove_department */
-CALL remove_department(6, 1); --expected to pass, no employees moved
-CALL remove_department(3, 5); --expected to pass
-CALL remove_department(7, 2); --expected to fail, department does not exist
+CALL remove_department(12, 1); --expected to pass, no employees moved
+CALL remove_department(1, 11); --expected to pass
+CALL remove_department(99, 2); --expected to fail, department does not exist
 
 /* Function (3) add_room */
 CALL add_room(5, 12, 'Marketing Meeting Room', 25, 5); --expected to pass
 CALL add_room(1, 31, 'Finance Meeting Room', 15, 1); --expected to fail, room already exists
-CALL add_room(5, 09, 'Discussion Room', 30, 6); --expected to fail, department does not exist
+CALL add_room(5, 09, 'Discussion Room', 30, 77); --expected to fail, department does not exist
 
 /* Function (4) change_capacity */
-CALL change_capacity(5, 12, 55, '2021-11-3', 12); --expected to pass
+CALL change_capacity(3, 32, 55, '2021-11-3', 12); --expected to pass
 CALL change_capacity(1, 11, 15, '2021-11-20', 15); --expected to pass
 CALL change_capacity(1, 11, 5, '2021-11-20', 15); --expected to pass, same room updated on same day
 CALL change_capacity(4, 18, 40, '2021-12-5', 12); --expected to fail, room does not exist
