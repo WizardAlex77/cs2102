@@ -1,3 +1,11 @@
+DROP PROCEDURE IF EXISTS add_department, remove_department, add_room, change_capacity, add_employee, remove_employee,
+book_room, unbook_room, join_meeting, leave_meeting, approve_meeting, declare_health;
+
+DROP FUNCTION IF EXISTS search_room, contact_tracing, non_compliance, view_booking_report, view_future_meeting, view_manager_report,
+generate_employee_email(), delete_meeting(), detect_fever(), detect_booker(), on_session_join_triggerfunc(), on_session_leave_triggerfunc();
+
+DROP TRIGGER IF EXISTS add_employee_email, reject_meeting, fever_detector, booker_detector, participant_increment, participant_decrement;
+
 /*---------------------------------------------------------*/
 /* BASIC FUNCTIONALITIES */
 /*---------------------------------------------------------*/
@@ -633,7 +641,6 @@ BEGIN
 		ORDER BY s.sdate,s.stime ASC; 
 	
 END;
-<<<<<<< Updated upstream
 $$ Language plpgsql;
 
 /*--------------------------------------------------*/
