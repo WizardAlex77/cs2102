@@ -1,11 +1,3 @@
-DROP PROCEDURE IF EXISTS add_department, remove_department, add_room, change_capacity, add_employee, remove_employee,
-book_room, unbook_room, join_meeting, leave_meeting, approve_meeting, declare_health;
-
-DROP FUNCTION IF EXISTS search_room, contact_tracing, non_compliance, view_booking_report, view_future_meeting, view_manager_report,
-generate_employee_email(), delete_meeting(), detect_fever(), detect_booker(), on_session_join_triggerfunc(), on_session_leave_triggerfunc();
-
-DROP TRIGGER IF EXISTS add_employee_email, reject_meeting, fever_detector, booker_detector, participant_increment, participant_decrement;
-
 /*---------------------------------------------------------*/
 /* BASIC FUNCTIONALITIES */
 /*---------------------------------------------------------*/
@@ -191,8 +183,11 @@ AS $$
 					AND s.sroom = mr.room)
 	AND u.floor = mr.floor
 	AND u.room = mr.room
-	AND MAX(u.udate)
-	AND sdate > u.date
+	AND u.udate = (SELECT MAX(u.udate)
+				FROM Updates u
+				where Date >= u.udate
+				AND u.floor = mr.floor
+				AND u.room = mr.room)
 	ORDER BY u.capacity ASC;
 	
 $$ LANGUAGE sql;

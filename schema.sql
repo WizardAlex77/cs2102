@@ -1,6 +1,19 @@
 DROP TABLE IF EXISTS Departments, Employees, HealthDeclarations, MeetingRooms,
 Sessions, Joins, Updates cascade;
 
+DROP PROCEDURE IF EXISTS add_department, remove_department, add_room, change_capacity(INTEGER, INTEGER, INTEGER, DATE, INTEGER), add_employee, remove_employee,
+book_room, unbook_room, join_meeting, leave_meeting, approve_meeting, declare_health CASCADE;
+
+DROP FUNCTION IF EXISTS search_room, contact_tracing, non_compliance, view_booking_report, view_future_meeting, view_manager_report,
+generate_employee_email(), delete_meeting(), detect_fever(), detect_booker(), on_session_join_triggerfunc(), on_session_leave_triggerfunc() cascade;
+
+DROP TRIGGER IF EXISTS add_employee_email on Employees cascade;
+DROP TRIGGER IF EXISTS reject_meeting on Sessions cascade;
+DROP TRIGGER IF EXISTS fever_detector on HealthDeclarations cascade; 
+DROP TRIGGER IF EXISTS booker_detector on Joins cascade;
+DROP TRIGGER IF EXISTS participant_increment on Joins cascade;
+DROP TRIGGER IF EXISTS participant_decrement on Joins cascade;
+
 /* ====================================== CREATE TABLES ====================================== */
 
 CREATE TABLE Departments (

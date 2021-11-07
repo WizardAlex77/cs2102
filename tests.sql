@@ -164,8 +164,8 @@ CALL declarehealth(5, '2021-10-16', 36.5); --expected to fail - correct
 
 /* Function search_room */
 
-SELECT search_room('2022-05-10', '09:00', '15:00'); --should return 12 rooms
-SELECT search_room('2022-05-13', '09:00', '15:00'); --should return 14 rooms
+SELECT * FROM search_room('2022-05-10', '09:00', '15:00'); --should return 12 rooms
+SELECT * FROM search_room('2022-05-13', '09:00', '15:00'); --should return 14 rooms
 
 CALL book_room(1, 11, '2022-05-10', '09:00', '10:00', 2); --expect to fail -- has booked another room during same timing
 CALL book_room(2, 22, '2022-04-10', '08:00', '12:00', 2); -- expect to pass
@@ -178,7 +178,7 @@ CALL unbook_room(2, 22, '2022-04-12', '08:00', '12:00', 2); -- expect to fail - 
 CALL unbook_room(2, 22, '2022-04-12', '08:00', '12:00', 3); -- expect to pass
 CALL unbook_room(2, 22, '2022-04-10', '08:00', '12:00', 2); -- expect to pass 
 
-SELECT view_manager_report('2022-04-10', 2); -- pass;should have 2 reports
-SELECT view_manager_report('2022-04-11', 2); -- pass;should have 2 reports
-SELECT view_manager_report('2022-05-10', 2); -- pass;should have 1 report
-SELECT view_manager_report('2022-05-10', 3); -- fail;should throw employee error
+SELECT * FROM view_manager_report('2022-04-10', 12); -- pass;should have 2 reports
+SELECT * FROM view_manager_report('2022-04-11', 12); -- pass;should have 2 reports
+SELECT * FROM view_manager_report('2022-05-10', 12); -- pass;should have 1 report
+SELECT * FROM view_manager_report('2022-05-10', 13); -- fail;should throw employee error
