@@ -101,27 +101,27 @@ insert into Updates values ('2021-11-1', 4, 15, 2); --#-4-15, department 8
 
 /*---------------------------------------------------------*/
 /* for testing _meeting functions */
-INSERT INTO Sessions VALUES ('2022-04-10', '09:00:00' , 2 , 21 , 8, 1, NULL); -- HR private room
+INSERT INTO Sessions VALUES ('2022-04-10', '09:00:00' , 2 , 21 , 8, 1, NULL); -- Database Meeting Room
 INSERT INTO Sessions VALUES ('2022-04-10', '12:00:00' , 2 , 21 , 8, 1, 'approved');
-INSERT INTO Sessions VALUES ('2022-04-18', '08:00:00' , 2 , 34 , 13, 1, NULL); -- HR conferencing room
+INSERT INTO Sessions VALUES ('2022-04-18', '08:00:00' , 2 , 34 , 13, 1, NULL); -- Auditorium
 INSERT INTO Sessions VALUES ('2022-05-10', '09:00:00' , 4 , 11 , 13, 1, NULL);
-INSERT INTO Sessions VALUES ('2022-05-10', '09:00:00' , 2 , 23 , 8, 1, 'approved'); -- Videoconferencing Room
+INSERT INTO Sessions VALUES ('2022-05-10', '09:00:00' , 2 , 23 , 8, 1, 'approved'); -- Database Meeting Room
 INSERT INTO Sessions VALUES ('2022-05-10', '10:00:00' , 2 , 23 , 8, 1, 'approved');
 -- long sessions
-INSERT INTO Sessions VALUES ('2022-10-29', '09:00:00' , 3 , 11 , 8, 1, NULL); -- HR Room
+INSERT INTO Sessions VALUES ('2022-10-29', '09:00:00' , 3 , 11 , 8, 1, NULL); -- Specialists Meeting Room
 INSERT INTO Sessions VALUES ('2022-10-29', '10:00:00' , 3 , 11 , 8, 1, NULL);
 INSERT INTO Sessions VALUES ('2022-10-29', '11:00:00' , 3 , 11 , 8, 1, NULL);
 
-INSERT INTO Sessions VALUES ('2022-10-31', '11:00:00' , 3 , 32 , 8, 1, NULL); -- Marketing room
+INSERT INTO Sessions VALUES ('2022-10-31', '11:00:00' , 3 , 32 , 8, 1, NULL); -- Hollow Square Room
 INSERT INTO Sessions VALUES ('2022-10-31', '12:00:00' , 3 , 32 , 8, 1, NULL);
 INSERT INTO Sessions VALUES ('2022-10-31', '13:00:00' , 3 , 32 , 8, 1, NULL);
 
 -- simulate initial booking of sessions
-INSERT INTO Joins VALUES(8,'2022-04-10', '09:00:00', 2, 21); -- to simulate initial booking of HR private room
+INSERT INTO Joins VALUES(8,'2022-04-10', '09:00:00', 2, 21); -- to simulate initial booking of Database Meeting Room
 INSERT INTO Joins VALUES(8,'2022-04-10', '12:00:00', 2, 21);
-INSERT INTO Joins VALUES(13,'2022-04-18', '08:00:00', 2, 34); -- to simulate initial booking of HR conferencing room
+INSERT INTO Joins VALUES(13,'2022-04-18', '08:00:00', 2, 34); -- to simulate initial booking of Auditorium
 INSERT INTO Joins VALUES(13,'2022-05-10', '09:00:00', 4, 11);
-INSERT INTO Joins VALUES(8,'2022-05-10', '09:00:00', 2, 23); -- to simulate initial booking of Videoconferencing Room
+INSERT INTO Joins VALUES(8,'2022-05-10', '09:00:00', 2, 23); -- to simulate initial booking of Database Meeting Room
 INSERT INTO Joins VALUES(8,'2022-05-10', '10:00:00', 2, 23);
 
 -- simulate initial booking of long sessions
