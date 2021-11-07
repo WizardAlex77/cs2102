@@ -142,10 +142,10 @@ INSERT INTO Joins VALUES(14,'2021-11-11', '10:00:00' , 5 , 03);
 
 /* for testing updates to room capacity */
 INSERT INTO Sessions VALUES ('2021-10-10', '10:00:00' , 4 , 15 , 10, 1, NULL);
-INSERT INTO Sessions VALUES ('2021-11-11', '10:00:00' , 2 , 39 , 11, 1, NULL);
+INSERT INTO Sessions VALUES ('2021-11-11', '10:00:00' , 4 , 15 , 10, 1, NULL);
 
 INSERT INTO Joins VALUES(10,'2021-10-10', '10:00:00' , 4 , 15);
-INSERT INTO Joins VALUES(11,'2021-11-11', '10:00:00' , 2 , 39);
+INSERT INTO Joins VALUES(10,'2021-11-11', '10:00:00' , 4 , 15);
 
 /*---------------------------------------------------------*/
 
