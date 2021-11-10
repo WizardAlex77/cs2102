@@ -185,6 +185,12 @@ CALL approve_meeting(3, 11,'2022-10-29', '09:00:00', '12:00:00', 11, 'approved')
 CALL approve_meeting(3, 11,'2022-10-29', '09:00:00', '12:00:00', 17, 'approved'); -- successful
 CALL approve_meeting(3, 32,'2022-10-31', '11:00:00', '14:00:00', 18, 'rejected'); -- successful
 
+/* tests for updated functions */
+CALL remove_employee(21, '2021-10-30');
+CALL join_meeting(5, 03,'2021-11-10', '10:00:00', '11:00:00', 21);
+CALL approve_meeting(5, 03,'2021-11-10', '10:00:00', '11:00:00', 21, 'rejected');
+
+/* set up for view_future_meeting */
 CALL join_meeting(4, 11,'2022-05-10', '09:00:00', '10:00:00', 4);
 CALL join_meeting(2, 34,'2022-04-18', '08:00:00', '09:00:00', 4);
 CALL approve_meeting(4, 11,'2022-05-10', '09:00:00', '10:00:00', 19, 'approved');
