@@ -317,7 +317,8 @@ DECLARE
 BEGIN
     
     IF ((EXISTS(SELECT 1 FROM Sessions WHERE sdate = mdate AND stime = mshour AND sroom = mroom AND sfloor = mfloor AND approval_status IS NULL)) 
-    AND (NOT EXISTS(SELECT 1 FROM Joins WHERE eid = emp AND sdate = mdate AND stime = mshour AND sroom = mroom AND sfloor = mfloor))) THEN
+    AND (NOT EXISTS(SELECT 1 FROM Joins WHERE eid = emp AND sdate = mdate AND stime = mshour AND sroom = mroom AND sfloor = mfloor))
+	AND (EXISTS(SELECT 1 FROM Employees WHERE eid = emp AND resignation_date IS NULL))) THEN
 
 		SELECT u.capacity INTO cap FROM Updates u WHERE u.udate = (SELECT MAX(udate) FROM Updates WHERE room = mroom AND floor = mfloor AND udate <= mdate) AND room = mroom AND floor = mfloor;
         IF ((SELECT s.participants FROM Sessions s WHERE sdate = mdate AND stime = mshour AND sroom = mroom AND sfloor = mfloor) < cap) THEN
@@ -386,7 +387,9 @@ BEGIN
 
     IF (EXISTS(SELECT 1 FROM Sessions WHERE sdate = mdate AND stime = mshour AND sroom = mroom AND sfloor = mfloor AND approval_status IS NULL)) THEN
         IF (((SELECT etype FROM Employees WHERE eid = emp) = 'Manager')
-        AND ((SELECT did FROM Employees WHERE eid = emp) = (SELECT did FROM MeetingRooms WHERE floor = mfloor AND room = mroom))) THEN
+        AND ((SELECT did FROM Employees WHERE eid = emp) = (SELECT did FROM MeetingRooms WHERE floor = mfloor AND room = mroom))
+		AND (EXISTS(SELECT 1 FROM Employees WHERE eid = emp AND resignation_date IS NULL))) THEN
+		
             WHILE temp < mehour LOOP
                 UPDATE Sessions
                 SET approval_status = decision
@@ -589,13 +592,21 @@ FOR EACH ROW EXECUTE FUNCTION detect_booker();
 CREATE OR REPLACE FUNCTION non_compliance 
 (IN StartDate DATE, IN EndDate DATE)
 RETURNS TABLE(EmployeeID INTEGER, Days INTEGER) AS $$
-	SELECT eid, ((EndDate - StartDate + 1) - count(*)) as days
-	FROM HealthDeclarations
-	WHERE ddate >= StartDate
-	AND ddate <= EndDate
-	GROUP BY eid 
-	HAVING (EndDate - StartDate + 1) - COUNT(*) > 0
-	ORDER BY days DESC;
+  (SELECT eid, ((EndDate - StartDate + 1) - count(*)) as days
+  FROM HealthDeclarations
+  WHERE ddate >= StartDate
+  AND ddate <= EndDate
+  GROUP BY eid 
+  HAVING (EndDate - StartDate + 1) - COUNT(*) > 0
+  ORDER BY days DESC)
+
+  UNION all
+
+  (SELECT eid, (EndDate - StartDate + 1) as days
+  FROM Employees
+  WHERE eid NOT IN (SELECT eid FROM HealthDeclarations WHERE ddate >= StartDate
+  AND ddate <= EndDate)
+  );
 $$ language sql;
 
 /*---------------------------------------------------------*/
