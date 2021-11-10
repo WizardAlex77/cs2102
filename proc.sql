@@ -351,7 +351,7 @@ BEGIN
             RAISE NOTICE 'room capacity reached';
         END IF;
     ELSE 
-        RAISE NOTICE 'session does not exist or has already been finalized or employee already joined';
+        RAISE NOTICE 'session does not exist or has already been finalized or employee already joined or employee has resigned';
 
     END IF;
 
@@ -425,7 +425,7 @@ BEGIN
         END IF;
 
     ELSE
-        RAISE NOTICE 'session does not exist or has already been approved';
+        RAISE NOTICE 'session does not exist or has already been approved or employee has resigned';
 
     END IF;
 END;
