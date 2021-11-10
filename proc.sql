@@ -97,13 +97,13 @@ BEGIN
 			RAISE EXCEPTION 'Employee record does not exist!'; 
 		ELSE
 			IF ((select e.etype from Employees e where e.eid = employee_id) = 'Manager') THEN
-				IF (NOT EXISTS(select 1 from Updates where udate = date_changed)) THEN
+				IF (NOT EXISTS(select 1 from Updates where udate = date_changed and floor = floor_number and room = room_number)) THEN
 					--there has already been an update to room capacity on the same day
 					insert into Updates values (date_changed, floor_number, room_number, new_capacity);
 					RAISE NOTICE 'Meeting room capacity for #%-% has been updated!', floor_number, room_number;
 				ELSE
 					--eg. if manager made a mistake in setting new room capacity
-					update Updates set capacity = new_capacity where udate = date_changed;
+					update Updates set capacity = new_capacity where udate = date_changed and floor = floor_number and room = room_number;
 					RAISE NOTICE 'Meeting room capacity for #%-% has been updated!', floor_number, room_number;
 				END IF;
 			ELSE

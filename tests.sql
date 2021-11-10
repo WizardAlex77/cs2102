@@ -5,30 +5,29 @@ CALL add_department(1, 'Accounting'); --expected to fail; department already exi
 
 /* Function (2) remove_department */
 CALL remove_department(12, 1); --expected to pass, no employees moved
-CALL remove_department(1, 11); --expected to pass
+CALL remove_department(1, 11); --expected to pass, employees 1, 8, 12 moved to department 11
 CALL remove_department(99, 2); --expected to fail, department does not exist
 
 /* Function (3) add_room */
-CALL add_room(5, 12, 'Marketing Meeting Room', 25, 5); --expected to pass
-CALL add_room(1, 31, 'Finance Meeting Room', 15, 1); --expected to fail, room already exists
+CALL add_room(3, 07, 'Production Meeting Room', 10, 5); --expected to pass
+CALL add_room(1, 31, 'Finance Meeting Room', 15, 11); --expected to fail, room already exists
 CALL add_room(5, 09, 'Discussion Room', 30, 77); --expected to fail, department does not exist
 
 /* Function (4) change_capacity */
-CALL change_capacity(3, 32, 55, '2021-11-3', 12); --expected to pass
-CALL change_capacity(1, 11, 15, '2021-11-20', 15); --expected to pass
-CALL change_capacity(1, 11, 5, '2021-11-20', 15); --expected to pass, same room updated on same day
-CALL change_capacity(4, 18, 40, '2021-12-5', 12); --expected to fail, room does not exist
-CALL change_capacity(2, 22, 18, '2021-12-2', 1); --expected to fail, employee is not MANAGER
-CALL change_capacity(3, 26, 20, '2021-12-2', 99); --expected to fail, employee does not exist
+CALL change_capacity(3, 32, 5, '2021-11-21', 12); --expected to pass
+CALL change_capacity(1, 31, 9, '2021-11-21', 13); --expected to pass
+CALL change_capacity(1, 31, 5, '2021-11-21', 13); --expected to pass, same room updated on same day
+CALL change_capacity(4, 18, 5, '2021-12-5', 12); --expected to fail, room does not exist
+CALL change_capacity(2, 39, 5, '2021-12-5', 1); --expected to fail, employee is not MANAGER
+CALL change_capacity(3, 26, 5, '2021-12-5', 99); --expected to fail, employee does not exist
 
 /* Function (5) add_employee */
 CALL add_employee('Sally Tan Hui Yun', 'Junior', 5, 91010101, null, 62020202); --expected to pass
-CALL add_employee('Lim Jun Jie', 'Senior', 4, 90123456, 65432109, null); --expected to pass
-CALL add_employee('Sally Tan', 'Junior', 4, 91010101, null, 62020202); --expected to fail; employee already exists
-CALL add_employee('Gareth Koh', 'Junior', 1, 99998880, null, null); --expected to pass (although there is already a Gareth Koh)
+CALL add_employee('Sally Tan', 'Junior', 9, 91010101, null, 62020202); --expected to fail; employee already exists
+CALL add_employee('Gareth Koh', 'Junior', 10, 99998880, null, null); --expected to pass (although there is already a Gareth Koh)
 
 /* Function (6) remove_employee */
-CALL remove_employee(18, '2021-11-2'); --expected to pass
+CALL remove_employee(23, '2021-11-2'); --expected to pass
 CALL remove_employee(99, '2021-11-2'); --expected to fail, employee does not exist
 
 /* THIS IS A PLACEHOLDER 
