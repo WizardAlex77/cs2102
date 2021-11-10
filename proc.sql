@@ -166,12 +166,25 @@ FOR EACH ROW EXECUTE FUNCTION generate_employee_email();
 --remove_employee
 CREATE OR REPLACE PROCEDURE remove_employee(employee_id INTEGER, last_day_of_work DATE)
 AS $$
+DECLARE 
+	curs CURSOR FOR (
+		select j.eid, j.sdate from Joins j
+		where eid = employee_id
+		and sdate > last_day_of_work);
+	r RECORD;
 BEGIN
 	IF (NOT EXISTS(select 1 from Employees where eid = employee_id)) THEN
 		RAISE EXCEPTION 'Employee does not exist!';
 	ELSE
 		update Employees set resignation_date = last_day_of_work where eid = employee_id;
+		OPEN curs;
+		LOOP
+			FETCH curs INTO r; 
+			EXIT WHEN NOT FOUND;
+			delete from Joins where eid = r.eid and sdate = r.sdate;
+		END LOOP;
 		RAISE NOTICE 'Employee % has resigned and record is updated.', employee_id;
+
 	END IF;
 END
 $$ LANGUAGE plpgsql;
