@@ -99,6 +99,11 @@ insert into Updates values ('2021-11-1', 2, 21, 2); --#02-21, department 4
 insert into Updates values ('2021-11-1', 2, 39, 4); --#02-39, department 5
 insert into Updates values ('2021-11-1', 4, 15, 2); --#-4-15, department 8
 
+INSERT INTO Sessions VALUES ('2021-11-22', '10:00:00' , 3, 32, 18, 8, NULL);
+INSERT INTO Sessions VALUES ('2021-11-23', '11:00:00' , 3, 32, 18, 7, NULL); 
+INSERT INTO Sessions VALUES ('2021-11-22', '10:00:00' , 1, 31, 18, 10, NULL);
+INSERT INTO Sessions VALUES ('2021-11-23', '11:00:00' , 1, 31, 18, 12, NULL); 
+
 /*---------------------------------------------------------*/
 /* for testing _meeting functions */
 INSERT INTO Sessions VALUES ('2022-04-10', '09:00:00' , 2 , 21 , 8, 1, NULL); -- Database Meeting Room

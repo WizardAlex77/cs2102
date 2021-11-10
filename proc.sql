@@ -89,6 +89,14 @@ $$ LANGUAGE plpgsql;
 --change_capacity
 CREATE OR REPLACE PROCEDURE change_capacity(floor_number INTEGER, room_number INTEGER, new_capacity INTEGER, date_changed DATE, employee_id INTEGER)
 AS $$
+DECLARE 
+	curs1 CURSOR FOR (
+		select sfloor, sroom, sdate, participants from Sessions s 
+		where sfloor = floor_number
+		and sroom = room_number
+		and sdate >= date_changed
+		and participants > new_capacity);
+	r1 RECORD;
 BEGIN
 	IF (NOT EXISTS(select 1 from MeetingRooms where room = room_number AND floor = floor_number)) THEN
 		RAISE EXCEPTION 'Meeting room does not exist!';
@@ -96,16 +104,21 @@ BEGIN
 		IF (NOT EXISTS(select 1 from Employees where eid = employee_id)) THEN
 			RAISE EXCEPTION 'Employee record does not exist!'; 
 		ELSE
-			IF ((select e.etype from Employees e where e.eid = employee_id) = 'Manager') THEN
+			IF ((select e.etype from Employees e where e.eid = employee_id and resignation_date is null) = 'Manager') THEN
 				IF (NOT EXISTS(select 1 from Updates where udate = date_changed and floor = floor_number and room = room_number)) THEN
-					--there has already been an update to room capacity on the same day
 					insert into Updates values (date_changed, floor_number, room_number, new_capacity);
 					RAISE NOTICE 'Meeting room capacity for #%-% has been updated!', floor_number, room_number;
 				ELSE
-					--eg. if manager made a mistake in setting new room capacity
 					update Updates set capacity = new_capacity where udate = date_changed and floor = floor_number and room = room_number;
 					RAISE NOTICE 'Meeting room capacity for #%-% has been updated!', floor_number, room_number;
 				END IF;
+
+				OPEN curs1;
+				LOOP
+					FETCH curs1 INTO r1; 
+					EXIT WHEN NOT FOUND;
+					delete from Sessions where sfloor = r1.sfloor and sroom = r1.sroom and sdate = r1.sdate and participants = r1.participants;
+				END LOOP;
 			ELSE
 				RAISE EXCEPTION 'Only a MANAGER can change room capacity.';
 			END IF;
