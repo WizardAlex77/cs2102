@@ -27,7 +27,7 @@ CALL add_employee('Sally Tan', 'Junior', 9, 91010101, null, 62020202); --expecte
 CALL add_employee('Gareth Koh', 'Junior', 10, 99998880, null, null); --expected to pass (although there is already a Gareth Koh)
 
 /* Function (6) remove_employee */
-CALL remove_employee(8, '2021-10-30'); --expected to pass
+CALL remove_employee(10, '2021-10-30'); --expected to pass
 CALL remove_employee(99, '2021-11-2'); --expected to fail, employee does not exist
 
 /* THIS IS A PLACEHOLDER 
