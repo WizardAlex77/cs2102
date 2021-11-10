@@ -228,6 +228,12 @@ BEGIN
 				OR etype = 'Senior')) 
 				THEN RAISE EXCEPTION 'Current Employee does not have sufficient rights to book a room';
 	END IF;
+/* exception case: employee has already resigned */
+    IF NOT EXISTS(SELECT 1 from employees
+			WHERE eid = EmployeeID
+			AND resignation_date IS NULL)
+			THEN RAISE EXCEPTION 'Employee has already resigned.';
+	END IF;
 /* exception case: meeting room is already booked during stipulated timing*/
 	IF EXISTS(SELECT 1 from Sessions s
 			WHERE brdate = s.sdate

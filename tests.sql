@@ -198,21 +198,33 @@ CALL declarehealth(5, '2021-10-16', 36.5); --expected to fail - correct
 
 /* Function search_room */
 
-SELECT * FROM search_room('2022-05-10', '09:00', '15:00'); --should return 12 rooms
-SELECT * FROM search_room('2022-05-13', '09:00', '15:00'); --should return 14 rooms
+SELECT * FROM search_room('2022-05-10', '09:00', '15:00'); --should return 12 rooms /3-32 cap is 9
+SELECT * FROM search_room('2022-05-13', '09:00', '15:00'); --should return 14 rooms /3-32 cap is 9
+CALL change_capacity(3, 32, 5, '2022-05-12', 12); -- inbetween the two dates
+SELECT * FROM search_room('2022-05-10', '09:00', '15:00'); --should return 12 rooms /3-32 cap is still 9
+SELECT * FROM search_room('2022-05-13', '09:00', '15:00'); --should return 14 rooms /3-32 cap is now 5
 
-CALL book_room(1, 11, '2022-05-10', '09:00', '10:00', 2); --expect to fail -- has booked another room during same timing
-CALL book_room(2, 22, '2022-04-10', '08:00', '12:00', 2); -- expect to pass
-CALL book_room(2, 22, '2022-04-12', '08:00', '12:00', 3); -- expect to pass
-CALL book_room(2, 22, '2022-04-13', '08:00', '12:00', 1); -- expect to fail -- employee access error
+CALL book_room(1, 11, '2022-05-10', '09:00', '10:00', 12); --expect to pass
+CALL book_room(2, 11, '2022-05-10', '09:00', '10:00', 13); --expect to fail -- booker has already booked another room at the same timing
+CALL book_room(2, 22, '2022-04-10', '08:00', '12:00', 12); -- expect to fail -- meeting room does not exist - sql foreign key constraint check
+CALL book_room(2, 21, '2022-04-12', '08:00', '12:00', 13); -- expect to pass -- able to add multiple sessions with time range
+SELECT * FROM Sessions; -- to show that above works
+CALL book_room(2, 21, '2022-04-13', '08:00', '12:00', 1); -- expect to fail -- employee access error
+CALL remove_employee(13, '2021-11-2');
+CALL book_room(1, 11, '2022-04-10', '14:00', '16:00', 13); -- expect to fail -- employee has already resigned
 
 
-CALL unbook_room(1, 11, '2022-05-10', '09:00', '10:00', 2); -- expect to fail - no such session avail
-CALL unbook_room(2, 22, '2022-04-12', '08:00', '12:00', 2); -- expect to fail - not original booker
-CALL unbook_room(2, 22, '2022-04-12', '08:00', '12:00', 3); -- expect to pass
-CALL unbook_room(2, 22, '2022-04-10', '08:00', '12:00', 2); -- expect to pass 
+CALL unbook_room(1, 11, '2022-05-10', '09:00', '10:00', 12); -- expect to pass
+CALL unbook_room(1, 11, '2022-05-10', '09:00', '10:00', 12); -- expect to fail - no such session available
+CALL unbook_room(2, 21, '2022-04-12', '08:00', '12:00', 12); -- expect to fail - not original booker
+CALL unbook_room(2, 21, '2022-04-12', '08:00', '12:00', 3); -- expect to fail - no access right
+CALL unbook_room(2, 21, '2022-04-12', '08:00', '12:00', 13); -- expect to pass 
+SELECT * FROM Sessions; -- to show that above works
 
-SELECT * FROM view_manager_report('2022-04-10', 12); -- pass;should have 2 reports
-SELECT * FROM view_manager_report('2022-04-11', 12); -- pass;should have 2 reports
+SELECT * FROM view_manager_report('2022-04-10', 12); -- pass;should have 7 reports
+CALL book_room(1, 11, '2022-04-10', '14:00', '16:00', 8);
+SELECT * FROM view_manager_report('2022-04-10', 12); -- pass; should have 10 now 
+SELECT * FROM view_manager_report('2022-04-10', 13); -- pass;should have 2 reports
+SELECT * FROM view_manager_report('2022-04-11', 12); -- pass;should have 6 reports
 SELECT * FROM view_manager_report('2022-05-10', 12); -- pass;should have 1 report
-SELECT * FROM view_manager_report('2022-05-10', 13); -- fail;should throw employee error
+SELECT * FROM view_manager_report('2022-05-10', 3); -- fail;should throw employee error
