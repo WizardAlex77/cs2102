@@ -15,8 +15,8 @@ CALL add_room(5, 09, 'Discussion Room', 30, 77); --expected to fail, department 
 
 /* Function (4) change_capacity */
 CALL change_capacity(3, 32, 5, '2021-11-21', 12); --expected to pass
-CALL change_capacity(1, 31, 9, '2021-11-21', 13); --expected to pass
-CALL change_capacity(1, 31, 5, '2021-11-21', 13); --expected to pass, same room updated on same day
+CALL change_capacity(1, 31, 9, '2021-11-22', 13); --expected to pass
+CALL change_capacity(1, 31, 5, '2021-11-22', 13); --expected to pass, same room updated on same day
 CALL change_capacity(4, 18, 5, '2021-12-5', 12); --expected to fail, room does not exist
 CALL change_capacity(2, 39, 5, '2021-12-5', 1); --expected to fail, employee is not MANAGER
 CALL change_capacity(3, 26, 5, '2021-12-5', 99); --expected to fail, employee does not exist
