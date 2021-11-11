@@ -34,75 +34,16 @@ CALL add_employee('Gareth Koh', 'Junior', 10, 99998880, null, null); --expected 
 CALL remove_employee(23, '2021-10-30'); --expected to pass
 CALL remove_employee(99, '2021-11-2'); --expected to fail, employee does not exist
 
-/*join meeting*/ 
---join_meeting(mfloor INTEGER, mroom INTEGER, mdate DATE, mshour TIME, mehour TIME, emp INTEGER)
-
--- cannot join if already in
--- only can join meeting that has not been approved
--- meeting must not be over capacity
--- must add to Joins table
--- meeting must exist
-
-/*----------------------------------------------------*/
-/*leave_meeting*/
---leave_meeting(mfloor INTEGER, mroom INTEGER, mdate DATE, mshour TIME, mehour TIME, emp INTEGER)
-
--- cannot leave an approved meeting
--- must remove from joins table
--- meeting must exist and already part of it 
-
-/*----------------------------------------------------*/
-
-/*approve meeting*/
---approve_meeting(mfloor INTEGER, mroom INTEGER, mdate DATE, mshour TIME, mehour TIME, emp INTEGER, decision VARCHAR(10))
-
--- only can approve meeting in own department
--- should reflect 'approved' in sessions
--- should delete if rejected
-
-/*----------------------------------------------------*/
-
 /* --------------------------------- refresh schema and data now ---------------------------- */
 
--- these tests are run in this sequence 
--- for join_meeting, leave_meeting, approve_meeting and view_future meeting
-
-CALL join_meeting(2, 21,'2022-04-10', '12:00:00', '13:00:00', 4); -- unsuccessful cos approved alr
-CALL join_meeting(2, 21,'2022-04-10', '09:00:00', '10:00:00', 4); -- successful
-SELECT * from sessions;
-SELECT * from joins;
-CALL join_meeting(2, 21,'2022-04-10', '09:00:00', '10:00:00', 1); -- unsuccessful cos room full
-
-CALL leave_meeting(2, 21,'2022-04-10', '12:00:00', '13:00:00', 8); -- unsuccessful cos alr approved
-CALL leave_meeting(2, 21,'2022-04-10', '09:00:00', '10:00:00', 4); -- successful
-SELECT * from sessions;
-CALL leave_meeting(2, 21,'2022-04-10', '09:00:00', '10:00:00', 8); -- successful booker leave meeting
-SELECT * from sessions;
-
-CALL approve_meeting(3, 11,'2022-10-29', '09:00:00', '12:00:00', 12, 'approved'); -- unsuccessful cos not own dept
-CALL approve_meeting(3, 11,'2022-10-29', '09:00:00', '12:00:00', 11, 'approved'); -- unsuccessful cos not a manager
-CALL approve_meeting(3, 11,'2022-10-29', '09:00:00', '12:00:00', 17, 'approved'); -- successful
-CALL approve_meeting(3, 32,'2022-10-31', '11:00:00', '14:00:00', 18, 'rejected'); -- successful
-
--- set up to call view_future_meeting
-CALL join_meeting(4, 11,'2022-05-10', '09:00:00', '10:00:00', 4);
-CALL join_meeting(2, 34,'2022-04-18', '08:00:00', '09:00:00', 4);
-CALL approve_meeting(4, 11,'2022-05-10', '09:00:00', '10:00:00', 19, 'approved');
-CALL approve_meeting(2, 34,'2022-04-18', '08:00:00', '09:00:00', 15, 'approved'); -- employee 4 joins 2 meetings, and both are approved
-
-SELECT * FROM view_future_meeting(CAST('2022-04-10' AS DATE), 4); -- should show 2 meetings
-
-
-/* --------------------------------- refresh schema and data now ---------------------------- */
-
-/* Function search_room */
-
+/* Function (7) search_room */
 SELECT * FROM search_room('2022-05-10', '09:00', '15:00'); --should return 18 rooms /3-32 cap is 9
 SELECT * FROM search_room('2022-05-13', '09:00', '15:00'); --should return 20 rooms /3-32 cap is 9
 CALL change_capacity(3, 32, 5, '2022-05-12', 12); -- inbetween the two dates
 SELECT * FROM search_room('2022-05-10', '09:00', '15:00'); --should return 18 rooms /3-32 cap is still 9
 SELECT * FROM search_room('2022-05-13', '09:00', '15:00'); --should return 20 rooms /3-32 cap is now 5
 
+/* Function (8) book_room */
 /* CALL book_room(1, 11, '2022-05-10', '09:00', '10:00', 12); -- SKIP:expect to pass
 SELECT * FROM Sessions WHERE sdate = '2022-05-10'; --SKIP
 CALL book_room(2, 11, '2022-05-10', '09:00', '10:00', 12); --expect to fail -- booker has already booked another room at the same timing */
@@ -115,7 +56,7 @@ CALL book_room(2, 21, '2022-04-12', '08:00', '12:00', 13); -- expect to pass -- 
 SELECT * FROM Sessions WHERE sdate = '2022-04-12'; -- to show that above works
 CALL book_room(1, 21, '2022-04-12', '08:00', '12:00', 13); --expect to fail -- booker has already booked another room at the same timing
 
-
+/* Function (9) unbook_room */
 /* CALL unbook_room(1, 11, '2022-05-10', '09:00', '10:00', 12); -- expect to pass
 CALL unbook_room(1, 11, '2022-05-10', '09:00', '10:00', 12); -- expect to fail - no such session available */
 CALL unbook_room(2, 21, '2022-04-12', '08:00', '12:00', 12); -- expect to fail - not original booker
@@ -123,6 +64,7 @@ CALL unbook_room(2, 21, '2022-04-12', '08:00', '12:00', 13); -- expect to pass
 SELECT * FROM Sessions WHERE sdate = '2022-04-12'; -- to show that above works
 CALL unbook_room(2, 21, '2022-04-12', '08:00', '12:00', 13); -- expect to fail - no such session exists
 
+/* Function (18) view_manager_report */
 SELECT * FROM Employees;
 SELECT * FROM view_manager_report('2022-04-10', 12); -- pass;should have 7 reports
 CALL book_room(1, 11, '2022-04-10', '14:00', '16:00', 8); 
@@ -132,6 +74,40 @@ SELECT * FROM view_manager_report('2022-04-11', 12); -- pass;should have 6 repor
 SELECT * FROM view_manager_report('2022-05-10', 12); -- pass;should have 1 report */
 SELECT * FROM view_manager_report('2022-04-10', 13); -- pass;different department manager
 SELECT * FROM view_manager_report('2022-05-10', 3); -- fail;should throw employee error
+/* --------------------------------- refresh schema and data now ---------------------------- */
+
+
+/* Function (10) join_meeting */
+CALL join_meeting(2, 21,'2022-04-10', '12:00:00', '13:00:00', 4); -- unsuccessful cos approved alr
+CALL join_meeting(2, 21,'2022-04-10', '09:00:00', '10:00:00', 4); -- successful
+SELECT * from sessions;
+SELECT * from joins;
+CALL join_meeting(2, 21,'2022-04-10', '09:00:00', '10:00:00', 1); -- unsuccessful cos room full
+
+/* Function (11) leave_meeting */
+CALL leave_meeting(2, 21,'2022-04-10', '12:00:00', '13:00:00', 8); -- unsuccessful cos alr approved
+CALL leave_meeting(2, 21,'2022-04-10', '09:00:00', '10:00:00', 4); -- successful
+SELECT * from sessions;
+CALL leave_meeting(2, 21,'2022-04-10', '09:00:00', '10:00:00', 8); -- successful booker leave meeting
+SELECT * from sessions;
+
+/* Function (12) approve_meeting */
+CALL approve_meeting(3, 11,'2022-10-29', '09:00:00', '12:00:00', 12, 'approved'); -- unsuccessful cos not own dept
+CALL approve_meeting(3, 11,'2022-10-29', '09:00:00', '12:00:00', 11, 'approved'); -- unsuccessful cos not a manager
+CALL approve_meeting(3, 11,'2022-10-29', '09:00:00', '12:00:00', 17, 'approved'); -- successful
+CALL approve_meeting(3, 32,'2022-10-31', '11:00:00', '14:00:00', 18, 'rejected'); -- successful
+
+/* Function (17) view_future_meeting */
+-- set up to call view_future_meeting
+CALL join_meeting(4, 11,'2022-05-10', '09:00:00', '10:00:00', 4);
+CALL join_meeting(2, 34,'2022-04-18', '08:00:00', '09:00:00', 4);
+CALL approve_meeting(4, 11,'2022-05-10', '09:00:00', '10:00:00', 19, 'approved');
+CALL approve_meeting(2, 34,'2022-04-18', '08:00:00', '09:00:00', 15, 'approved'); -- employee 4 joins 2 meetings, and both are approved
+
+SELECT * FROM view_future_meeting(CAST('2022-04-10' AS DATE), 4); -- should show 2 meetings
+
+
+
 
 /* --------------------------------- refresh schema and data now ---------------------------- */
 
