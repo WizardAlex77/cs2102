@@ -141,6 +141,7 @@ SELECT * FROM contact_tracing(4, '2021-10-27');
 /* Set 5: Verify that view_booking_report works */
 SELECT * FROM view_booking_report('2022-11-29', 9); -- shows 1 meeting as approved
 
+
 /*join meeting*/ 
 --join_meeting(mfloor INTEGER, mroom INTEGER, mdate DATE, mshour TIME, mehour TIME, emp INTEGER)
 
@@ -168,23 +169,30 @@ SELECT * FROM view_booking_report('2022-11-29', 9); -- shows 1 meeting as approv
 -- should delete if rejected
 
 /*----------------------------------------------------*/
--- these tests are run in this sequence
---CALL join_meeting(2, 21,'2022-04-10', '09:00:00', '10:00:00', 8); -- unsuccessful cos already in
+
+/* --------------------------------- refresh schema and data now ---------------------------- */
+
+-- these tests are run in this sequence 
+-- for join_meeting, leave_meeting, approve_meeting and view_future meeting
+
 CALL join_meeting(2, 21,'2022-04-10', '12:00:00', '13:00:00', 4); -- unsuccessful cos approved alr
---CALL join_meeting(4, 11,'2022-01-01', '10:00:00', '11:00:00', 4); -- unsuccesful no such meeting
 CALL join_meeting(2, 21,'2022-04-10', '09:00:00', '10:00:00', 4); -- successful
+SELECT * from sessions;
+SELECT * from joins;
 CALL join_meeting(2, 21,'2022-04-10', '09:00:00', '10:00:00', 1); -- unsuccessful cos room full
 
 CALL leave_meeting(2, 21,'2022-04-10', '12:00:00', '13:00:00', 8); -- unsuccessful cos alr approved
 CALL leave_meeting(2, 21,'2022-04-10', '09:00:00', '10:00:00', 4); -- successful
---CALL leave_meeting(4, 11,'2022-01-01', '10:00:00', '11:00:00', 4); -- unsuccessful no such meeting
+SELECT * from sessions;
 CALL leave_meeting(2, 21,'2022-04-10', '09:00:00', '10:00:00', 8); -- successful booker leave meeting
+SELECT * from sessions;
 
 CALL approve_meeting(3, 11,'2022-10-29', '09:00:00', '12:00:00', 12, 'approved'); -- unsuccessful cos not own dept
 CALL approve_meeting(3, 11,'2022-10-29', '09:00:00', '12:00:00', 11, 'approved'); -- unsuccessful cos not a manager
 CALL approve_meeting(3, 11,'2022-10-29', '09:00:00', '12:00:00', 17, 'approved'); -- successful
 CALL approve_meeting(3, 32,'2022-10-31', '11:00:00', '14:00:00', 18, 'rejected'); -- successful
 
+-- set up to call view_future_meeting
 CALL join_meeting(4, 11,'2022-05-10', '09:00:00', '10:00:00', 4);
 CALL join_meeting(2, 34,'2022-04-18', '08:00:00', '09:00:00', 4);
 CALL approve_meeting(4, 11,'2022-05-10', '09:00:00', '10:00:00', 19, 'approved');
@@ -192,9 +200,6 @@ CALL approve_meeting(2, 34,'2022-04-18', '08:00:00', '09:00:00', 15, 'approved')
 
 SELECT * FROM view_future_meeting(CAST('2022-04-10' AS DATE), 4); -- should show 2 meetings
 
-/* Function (15) declare_health */
-CALL declarehealth(4, '2021-10-16', 36.5); --expected to pass - correct
-CALL declarehealth(5, '2021-10-16', 36.5); --expected to fail - correct
 
 /* --------------------------------- refresh schema and data now ---------------------------- */
 
