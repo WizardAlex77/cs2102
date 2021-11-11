@@ -34,118 +34,6 @@ CALL add_employee('Gareth Koh', 'Junior', 10, 99998880, null, null); --expected 
 CALL remove_employee(23, '2021-10-30'); --expected to pass
 CALL remove_employee(99, '2021-11-2'); --expected to fail, employee does not exist
 
-/* THIS IS A PLACEHOLDER 
-Set 1: Verify that the function works in the normal case (Passing) 
-CALL add_employee ('Grace', '98765432', 'Junior', 'Accounting')
-CALL add_employee ('Natalie', '12345678', 'Manager', 'HR')
-CALL add_employee ('Gareth', '99998888', 'Senior', 'Accounting')
-CALL add_employee ('Kevin', '88889999', 'Junior', 'Marketing')
-CALL add_employee ('Moose', '91111111', 'Manager', 'Marketing')
-
-/* Set 2: 
-    1. Verify that that function adds tuples to Health Declarations
-    2. Fever dectector trigger detects temperature and changes fever attribute correctly
-    3. Non-compliance function works
-*/ 
-
- /* Function (13) declare_health */
-CALL declare_health(1, '2022-11-08', 37.0); --employee 1 & 2 did not declare health on 2nd day
-CALL declare_health(2, '2022-11-08', 37.0);
-CALL declare_health(3, '2022-11-08', 37.0); 
-CALL declare_health(3, '2022-11-09', 36.2);
-CALL declare_health(4, '2022-11-08', 37.0); 
-CALL declare_health(4, '2022-11-09', 36.2);
-CALL declare_health(5, '2022-11-08', 37.0); 
-CALL declare_health(5, '2022-11-09', 36.2);
-CALL declare_health(6, '2022-11-08', 37.0); 
-CALL declare_health(6, '2022-11-09', 36.2);
-CALL declare_health(7, '2022-11-08', 37.0); 
-CALL declare_health(7, '2022-11-09', 36.2);
-CALL declare_health(8, '2022-11-08', 37.0); 
-CALL declare_health(8, '2022-11-09', 36.2);
-CALL declare_health(9, '2022-11-08', 37.0); 
-CALL declare_health(9, '2022-11-09', 36.2);
-CALL declare_health(10, '2022-11-08', 37.0); 
-CALL declare_health(10, '2022-11-09', 36.2);
-CALL declare_health(11, '2022-11-08', 37.0); 
-CALL declare_health(11, '2022-11-09', 36.2);
-CALL declare_health(12, '2022-11-08', 37.0); 
-CALL declare_health(12, '2022-11-09', 36.2);
-CALL declare_health(13, '2022-11-08', 37.0); 
-CALL declare_health(13, '2022-11-09', 36.2);
-CALL declare_health(14, '2022-11-08', 37.0); 
-CALL declare_health(14, '2022-11-09', 36.2);
-CALL declare_health(15, '2022-11-08', 37.0); 
-CALL declare_health(15, '2022-11-09', 36.2);
-CALL declare_health(16, '2022-11-08', 37.0); 
-CALL declare_health(16, '2022-11-09', 36.2);
-CALL declare_health(17, '2022-11-08', 37.0); 
-CALL declare_health(17, '2022-11-09', 36.2);
-CALL declare_health(18, '2022-11-08', 37.0); 
-CALL declare_health(18, '2022-11-09', 36.2);
-CALL declare_health(19, '2022-11-08', 37.0); 
-CALL declare_health(19, '2022-11-09', 36.2);
-CALL declare_health(20, '2022-11-08', 37.0); 
-CALL declare_health(20, '2022-11-09', 36.2);
-CALL declare_health(21, '2022-11-08', 37.0); 
-CALL declare_health(21, '2022-11-09', 36.2);
---3 additional employees added prior
-CALL declare_health(22, '2022-11-08', 37.0); 
-CALL declare_health(22, '2022-11-09', 36.2);
-CALL declare_health(23, '2022-11-08', 38.0); 
-CALL declare_health(23, '2022-11-09', 36.2);
-
-
-
-/* Function (15) non-compliance */
-SELECT * FROM non_compliance('2022-11-08', '2022-11-09'); -- employee 1 and 2 should have 1 day of non-compliance
-SELECT * FROM non_compliance('2022-11-08', '2022-11-08'); -- none, all employees declared health on that day
-
-/* Set 3: Verify that contact_tracing correctly identifies only employees in same meeting room within past 3 days*/
-CALL book_room(1, 21, '2022-11-23', '09:00:00' , '10:00:00', 8); -- Meeting A at (1,21) on the 23rd
-CALL book_room(1, 11, '2022-11-25', '09:00:00' , '10:00:00', 12); -- Meeting B at (1,11) on the 25th
-CALL book_room(1, 21, '2022-11-26', '09:00:00' , '10:00:00', 8); -- Meeting C at (1,21) on the 26rd
-
-CALL join_meeting(1, 21, '2022-11-23', '09:00:00' , '10:00:00', 4); -- Employee 4 & 8 at Meeting A
-CALL join_meeting(1, 11, '2022-11-25', '09:00:00' , '10:00:00', 3) -- Employee 3 & 12 at Meeting B
-CALL join_meeting(1, 21, '2022-11-26', '09:00:00' , '10:00:00', 2) -- Employee 2, 3 & 8 at Meeting C
-CALL join_meeting(1, 21, '2022-11-26', '09:00:00' , '10:00:00', 3)
-
-CALL approve_meeting(1, 21, '2022-11-23', '09:00:00' , '10:00:00', 12, 'approved');
-CALL approve_meeting(1, 11, '2022-11-25', '09:00:00' , '10:00:00', 12, 'approved');
-CALL approve_meeting(1, 21, '2022-11-26', '09:00:00' , '10:00:00', 12, 'approved');
-
-SELECT * FROM contact_tracing(8, '2022-11-27'); -- 8 has fever on 27th, past 3 days (24th to 27th), only employees 2 & 3 from Meeting C affected
--- declarehealth(4, '2021-10-27', 38.0);
-SELECT * FROM contact_tracing(8, '2022-11-26'); -- 4 has fever on 26th, past 3 days (23th to 26th), employees 2, 3 & 4 from Meeting A and C affected 
--- declarehealth(4, '2021-10-26', 38.0);
-
-/* Set 4: Verify that contact_tracing correctly removes fever and close-contact employees from future meetings*/
-
-CALL book_room(4, 11, '2022-11-29', '09:00:00' , '10:00:00', 8); -- Meeting D at (4,11) on the 29th
-CALL book_room(4, 26, '2022-11-30', '09:00:00' , '10:00:00', 9); -- Meeting E at (4,17) on the 30th
-CALL book_room(4, 11, '2022-12-10', '09:00:00' , '10:00:00', 9); -- Meeting D at (4,34) on the 19th of NEXT month
-
-CALL join_meeting(4, 11, '2022-11-29', '09:00:00' , '10:00:00', 12)-- Employee 8 & 12 at Meeting D, 8 is booker of meeting
-CALL join_meeting(4, 26, '2022-11-30', '09:00:00' , '10:00:00', 3) -- Employee 3, 8 & 9 at Meeting E, 9 is booker of meeting
-CALL join_meeting(4, 26, '2022-11-30', '09:00:00' , '10:00:00', 8) 
-CALL join_meeting(4, 11, '2022-12-10', '09:00:00' , '10:00:00', 3)  -- Employee 3, 8 & 9 at Meeting F, 9 is booker of meeting
-CALL join_meeting(4, 11, '2022-12-10', '09:00:00' , '10:00:00', 8) 
-
-CALL approve_meeting(4, 11, '2022-11-29', '09:00:00' , '10:00:00', 12, 'approved');
-CALL approve_meeting(1, 11, '2022-11-25', '09:00:00' , '10:00:00', 12, 'approved');
-CALL approve_meeting(1, 21, '2022-11-26', '09:00:00' , '10:00:00', 12, 'approved');
-
-SELECT * FROM contact_tracing(4, '2021-10-27');
--- declarehealth(4, '2021-10-27', 38.0);
--- Will remove Meeting D completely (and its related tuples in Joins) due to 8 being booker of meeting
--- Will remove 3 & 8 from Meeting E, but 9 will still attend.
--- Removes 8 from Meeting F (one month away) since Employee 8 is the one with the fever, but not 3, since 3 close-contact is only 7 days in the future.
-
-/* Set 5: Verify that view_booking_report works */
-SELECT * FROM view_booking_report('2022-11-29', 9); -- shows 1 meeting as approved
-
-
 /*join meeting*/ 
 --join_meeting(mfloor INTEGER, mroom INTEGER, mdate DATE, mshour TIME, mehour TIME, emp INTEGER)
 
@@ -244,3 +132,115 @@ SELECT * FROM view_manager_report('2022-04-11', 12); -- pass;should have 6 repor
 SELECT * FROM view_manager_report('2022-05-10', 12); -- pass;should have 1 report */
 SELECT * FROM view_manager_report('2022-04-10', 13); -- pass;different department manager
 SELECT * FROM view_manager_report('2022-05-10', 3); -- fail;should throw employee error
+
+/* --------------------------------- refresh schema and data now ---------------------------- */
+
+/* Set 4: 
+    1. Verify that that function adds tuples to Health Declarations
+    2. Fever dectector trigger detects temperature and changes fever attribute correctly
+    3. Non-compliance function works
+*/ 
+
+ /* Function (13) declare_health */
+SELECT * FROM HealthDeclarations;
+CALL declare_health(1, '2022-11-08', 37.0); --employee 1 & 2 did not declare health on 2nd day
+CALL declare_health(2, '2022-11-08', 37.0);
+CALL declare_health(3, '2022-11-08', 37.0); 
+CALL declare_health(3, '2022-11-09', 36.2);
+CALL declare_health(4, '2022-11-08', 37.0); 
+CALL declare_health(4, '2022-11-09', 36.2);
+CALL declare_health(5, '2022-11-08', 37.0); 
+CALL declare_health(5, '2022-11-09', 36.2);
+CALL declare_health(6, '2022-11-08', 37.0); 
+CALL declare_health(6, '2022-11-09', 36.2);
+CALL declare_health(7, '2022-11-08', 37.0); 
+CALL declare_health(7, '2022-11-09', 36.2);
+CALL declare_health(8, '2022-11-08', 37.0); 
+CALL declare_health(8, '2022-11-09', 36.2);
+CALL declare_health(9, '2022-11-08', 37.0); 
+CALL declare_health(9, '2022-11-09', 36.2);
+CALL declare_health(10, '2022-11-08', 37.0); 
+CALL declare_health(10, '2022-11-09', 36.2);
+CALL declare_health(11, '2022-11-08', 37.0); 
+CALL declare_health(11, '2022-11-09', 36.2);
+CALL declare_health(12, '2022-11-08', 37.0); 
+CALL declare_health(12, '2022-11-09', 36.2);
+CALL declare_health(13, '2022-11-08', 37.0); 
+CALL declare_health(13, '2022-11-09', 36.2);
+CALL declare_health(14, '2022-11-08', 37.0); 
+CALL declare_health(14, '2022-11-09', 36.2);
+CALL declare_health(15, '2022-11-08', 37.0); 
+CALL declare_health(15, '2022-11-09', 36.2);
+CALL declare_health(16, '2022-11-08', 37.0); 
+CALL declare_health(16, '2022-11-09', 36.2);
+CALL declare_health(17, '2022-11-08', 37.0); 
+CALL declare_health(17, '2022-11-09', 36.2);
+CALL declare_health(18, '2022-11-08', 37.0); 
+CALL declare_health(18, '2022-11-09', 36.2);
+CALL declare_health(19, '2022-11-08', 37.0); 
+CALL declare_health(19, '2022-11-09', 36.2);
+CALL declare_health(20, '2022-11-08', 37.0); 
+CALL declare_health(20, '2022-11-09', 36.2);
+CALL declare_health(21, '2022-11-08', 38.0); --employee 21 has fever on this day
+CALL declare_health(21, '2022-11-09', 36.2);
+SELECT * FROM HealthDeclarations;
+
+
+
+/* Function (15) non-compliance */
+SELECT * FROM non_compliance('2022-11-08', '2022-11-09'); -- employee 1 and 2 should have 1 day of non-compliance
+SELECT * FROM non_compliance('2022-11-08', '2022-11-08'); -- none, all employees declared health on that day
+
+/* Function (14) non_compliance: Verify that contact_tracing correctly identifies only employees in same meeting room within past 3 days*/
+SELECT * FROM Sessions;
+SELECT * FROM Joins;
+CALL book_room(1, 21, '2022-11-23', '09:00:00' , '10:00:00', 8); -- Meeting A at (1,21) on the 23rd
+CALL book_room(1, 11, '2022-11-25', '09:00:00' , '10:00:00', 12); -- Meeting B at (1,11) on the 25th
+CALL book_room(1, 21, '2022-11-26', '09:00:00' , '10:00:00', 8); -- Meeting C at (1,21) on the 26rd
+
+CALL join_meeting(1, 21, '2022-11-23', '09:00:00' , '10:00:00', 4); -- Employee 4 & 8 at Meeting A
+CALL join_meeting(1, 11, '2022-11-25', '09:00:00' , '10:00:00', 3); -- Employee 3 & 12 at Meeting B
+CALL join_meeting(1, 21, '2022-11-26', '09:00:00' , '10:00:00', 2); -- Employee 2, 3 & 8 at Meeting C
+CALL join_meeting(1, 21, '2022-11-26', '09:00:00' , '10:00:00', 3);
+
+CALL approve_meeting(1, 21, '2022-11-23', '09:00:00' , '10:00:00', 12, 'approved');
+CALL approve_meeting(1, 11, '2022-11-25', '09:00:00' , '10:00:00', 12, 'approved');
+CALL approve_meeting(1, 21, '2022-11-26', '09:00:00' , '10:00:00', 12, 'approved');
+
+SELECT * FROM Sessions;
+SELECT * FROM Joins;
+
+SELECT * FROM contact_tracing(8, '2022-11-27'); -- 8 has fever on 27th, past 3 days (24th to 27th), only employees 2 & 3 from Meeting C affected
+SELECT * FROM contact_tracing(8, '2022-11-26'); -- 4 has fever on 26th, past 3 days (23th to 26th), employees 2, 3 & 4 from Meeting A and C affected 
+
+/*Verify that contact_tracing correctly removes fever and close-contact employees from future meetings*/
+SELECT * FROM Sessions;
+SELECT * FROM Joins;
+CALL book_room(4, 11, '2022-11-29', '09:00:00' , '10:00:00', 8); -- Meeting D at (4,11) on the 29th
+CALL book_room(4, 26, '2022-11-30', '09:00:00' , '10:00:00', 9); -- Meeting E at (4,17) on the 30th
+CALL book_room(4, 11, '2022-12-10', '09:00:00' , '10:00:00', 9); -- Meeting F at (4,34) on the 10th of NEXT month
+
+CALL join_meeting(4, 11, '2022-11-29', '09:00:00' , '10:00:00', 12);-- Employee 8 & 12 at Meeting D, 8 is booker of meeting
+CALL join_meeting(4, 26, '2022-11-30', '09:00:00' , '10:00:00', 3); -- Employee 3, 8 & 9 at Meeting E, 9 is booker of meeting
+CALL join_meeting(4, 26, '2022-11-30', '09:00:00' , '10:00:00', 8); 
+CALL join_meeting(4, 11, '2022-12-10', '09:00:00' , '10:00:00', 3);  -- Employee 3, 8 & 9 at Meeting F, 9 is booker of meeting
+CALL join_meeting(4, 11, '2022-12-10', '09:00:00' , '10:00:00', 8); 
+
+CALL approve_meeting(4, 11, '2022-11-29', '09:00:00' , '10:00:00', 19, 'approved');
+CALL approve_meeting(4, 26, '2022-11-30', '09:00:00' , '10:00:00', 19, 'approved');
+CALL approve_meeting(4, 11, '2022-12-10', '09:00:00' , '10:00:00', 19, 'approved');
+
+SELECT * FROM Sessions;
+SELECT * FROM Joins;
+
+SELECT * FROM contact_tracing(8, '2022-11-27');
+
+SELECT * FROM Sessions;
+SELECT * FROM Joins;
+-- Will remove Meeting D completely (and its related tuples in Joins) due to 8 being booker of meeting
+-- Will remove 3 & 8 from Meeting E, but 9 will still attend.
+-- Removes 8 from Meeting F (one month away) since Employee 8 is the one with the fever, but not 3, since 3 close-contact is only 7 days in the future.
+
+/* Function (16) view_booking_report: Verify that view_booking_report works */
+SELECT * FROM Sessions;
+SELECT * FROM view_booking_report('2022-11-29', 9); -- shows 2 meetings as approved
