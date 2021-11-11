@@ -167,7 +167,7 @@ SELECT * FROM HealthDeclarations;
 SELECT * FROM non_compliance('2022-11-08', '2022-11-09'); -- employee 1 and 2 should have 1 day of non-compliance
 SELECT * FROM non_compliance('2022-11-08', '2022-11-08'); -- none, all employees declared health on that day
 
-/* Function (14) non_compliance: Verify that contact_tracing correctly identifies only employees in same meeting room within past 3 days*/
+/* Function (14) contact_tracing: Verify that contact_tracing correctly identifies only employees in same meeting room within past 3 days*/
 SELECT * FROM Sessions;
 SELECT * FROM Joins;
 CALL book_room(1, 21, '2022-11-23', '09:00:00' , '10:00:00', 8); -- Meeting A at (1,21) on the 23rd
