@@ -1,20 +1,27 @@
+/*************************************************
+BASIC FUNCTIONALITIES
+**************************************************/
+
 /* Function (1) add_department */
+SELECT * FROM departments;
 CALL add_department(11, 'Finance'); --expected to pass
-CALL add_department(12, 'Agile Solutions'); --expected to pass
 CALL add_department(1, 'Accounting'); --expected to fail; department already exists
 
 /* Function (2) remove_department */
-CALL remove_department(12, 1); --expected to pass, no employees moved
+SELECT * from employees;
+SELECT * from meetingrooms;
 CALL remove_department(1, 11); --expected to pass, employees 1, 8, 12 moved to department 11
 CALL remove_department(99, 2); --expected to fail, department does not exist
 
 /* Function (3) add_room */
+SELECT * from meetingrooms;
+SELECT * from updates;
 CALL add_room(3, 07, 'Production Meeting Room', 10, 5); --expected to pass
 CALL add_room(1, 31, 'Finance Meeting Room', 15, 11); --expected to fail, room already exists
 CALL add_room(5, 09, 'Discussion Room', 30, 77); --expected to fail, department does not exist
 
 /* Function (4) change_capacity */
-CALL change_capacity(3, 32, 5, '2021-11-21', 12); --expected to pass
+SELECT * from updates;
 CALL change_capacity(1, 31, 9, '2021-11-22', 13); --expected to pass
 CALL change_capacity(1, 31, 5, '2021-11-22', 13); --expected to pass, same room updated on same day
 CALL change_capacity(4, 18, 5, '2021-12-5', 12); --expected to fail, room does not exist
@@ -22,12 +29,13 @@ CALL change_capacity(2, 39, 5, '2021-12-5', 1); --expected to fail, employee is 
 CALL change_capacity(3, 26, 5, '2021-12-5', 99); --expected to fail, employee does not exist
 
 /* Function (5) add_employee */
+SELECT * FROM employees;
 CALL add_employee('Sally Tan Hui Yun', 'Junior', 5, 91010101, null, 62020202); --expected to pass
 CALL add_employee('Sally Tan', 'Junior', 9, 91010101, null, 62020202); --expected to fail; employee already exists
 CALL add_employee('Gareth Koh', 'Junior', 10, 99998880, null, null); --expected to pass (although there is already a Gareth Koh)
 
 /* Function (6) remove_employee */
-CALL remove_employee(10, '2021-10-30'); --expected to pass
+CALL remove_employee(23, '2021-10-30'); --expected to pass
 CALL remove_employee(99, '2021-11-2'); --expected to fail, employee does not exist
 
 /* THIS IS A PLACEHOLDER 
