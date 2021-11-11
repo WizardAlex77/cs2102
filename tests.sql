@@ -1,7 +1,3 @@
-/*************************************************
-BASIC FUNCTIONALITIES
-**************************************************/
-
 /* Function (1) add_department */
 SELECT * FROM departments;
 CALL add_department(11, 'Finance'); --expected to pass
